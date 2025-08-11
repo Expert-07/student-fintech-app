@@ -1,17 +1,21 @@
 //import React, { useEffect, useState } from "react";
-import Chart from "chart.js/auto";
+//import Chart from "chart.js/auto";
 import "../css/Dashboard.css";
 import React, { useEffect, useState } from "react";
 import {jwtDecode} from "jwt-decode";
-import { p } from "framer-motion/client";
-import { Link } from "react-router-dom";
+//import { p } from "framer-motion/client";
+//import { Link } from "react-router-dom";
 import TimetableForm from "./TimetableForm";
-import MonthlySummary from "./MonthlySummary";
+  // Modal close handler
+  const handleCloseModal = () => setShowModal(false);
+//import MonthlySummary from "./MonthlySummary";
 //import BudgetSuggestions from "./BudgetSuggestions";
 import Navbar from "./Navbar";
 import "../css/Dashboard.css";
-import BudgetSuggestions from "./BudgetSuggestions";
+//import BudgetSuggestions from "./BudgetSuggestions";
 import useWeeklySummary from "./useWeeklySummary";
+import SideBar from "./SideBar";
+import ReminderSystem from "./SmartReminders";
 
 
 // This template is a direct React conversion of your dashboard.html, ready for backend integration like Dashboard.jsx
@@ -125,6 +129,7 @@ export default function DashboardTemplate() {
     achievements: 18,
   });
   const { summary, loading: loadingWeekly } = useWeeklySummary();
+  console.log("Weekly summary:", summary);
   // Get token and decode user ID
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -229,62 +234,7 @@ export default function DashboardTemplate() {
   return (
     <div className="dashboard-layout">
       {/* Sidebar Navigation */}
-      <aside className="sidebar" id="sidebar">
-
-        <div className="logo">
-          <i className="fas fa-graduation-cap"></i>
-          <span className="ske">Student</span>
-          <span className="mart">Assist</span>
-        </div>
-        <nav className="dashboard-nav">
-          <ul>
-            <li>
-              <Link to="/dashboard" className="active">
-                <i className="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-
-              </Link>
-            </li>
-            <li>
-              <Link to="/edtech">
-                <i className="fas fa-book-open"></i>
-                <span>Reading Planner</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/finance">
-                <i className="fas fa-wallet"></i>
-                <span>Finance Tracker</span>
-              </Link>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fas fa-chart-line"></i>
-                <span>Progress Reports</span>
-              </a>
-            </li>
-            <li>
-              <Link to="/profile">
-                <i className="fas fa-user"></i>
-                <span>Profile</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/settings">
-                <i className="fas fa-cog"></i>
-                <span>Settings</span>
-              </Link>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </aside>
-
+<SideBar/>
       {/* Main Content Area */}
       <main className="main-content">
         {/* Dashboard Header */}
@@ -365,14 +315,51 @@ export default function DashboardTemplate() {
               <div className="stat-value">{stats.achievements}</div>
               <div className="stat-subtext">Master Reader unlocked</div>
             </div>
+
+                        <div className="stat-card fade-in">
+              <div className="stat-icon">
+                <i className="fas fa-trophy"></i>
+              </div>
+              <div className="stat-title">Smart Reminder</div>
+              <div className="stat-value"><ReminderSystem userId={user?.id}/></div>
+              <div className="stat-subtext">Master Reader unlocked</div>
+            </div>
           </div>
 
           {/* Goals Section */}
-          <div className="section-title">
+          <div className="section-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <h2>
               <i className="fas fa-bullseye"></i> Your Goals
             </h2>
+            <button
+              className="add-timetable-btn"
+              style={{
+                background: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', padding: '8px 16px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+              }}
+              onClick={() => setShowModal(true)}
+            >
+              + Add Timetable Entry
+            </button>
           </div>
+        {/* Timetable Entry Modal */}
+        {showModal && (
+          <div style={{
+            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.35)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}>
+            <div style={{ background: 'white', borderRadius: 12, boxShadow: '0 4px 32px rgba(0,0,0,0.18)', padding: 0, minWidth: 350, maxWidth: '90vw', position: 'relative' }}>
+              <button
+                onClick={handleCloseModal}
+                style={{ position: 'absolute', top: 10, right: 10, background: 'transparent', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer', zIndex: 2 }}
+                title="Close"
+              >
+                &times;
+              </button>
+              <div style={{ padding: 24 }}>
+                <TimetableForm onClose={handleCloseModal} />
+              </div>
+            </div>
+          </div>
+        )}
           <div className="goals-container">
             {/* Example goal cards, replace with dynamic data as needed */}
             <div className="goal-card fade-in">

@@ -10,22 +10,42 @@ const Timetable = () => {
   const [timetable, setTimetable] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Move fetchTimetable outside useEffect
+  const fetchTimetable = async () => {
+    setLoading(true);
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    try {
+      const res = await fetch(`http://localhost:5000/api/timetable/${userId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setTimetable(data || []);
+    } catch {
+      setTimetable([]);
+    }
+    setLoading(false);
+  };
+
+  // Now handleDelete can access fetchTimetable and token
+  const handleDelete = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`http://localhost:5000/api/timetable/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error('Failed to delete');
+      fetchTimetable();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
-    const fetchTimetable = async () => {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      const userId = localStorage.getItem('userId');
-      try {
-        const res = await fetch(`http://localhost:5000/api/timetable/${userId}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-        setTimetable(data || []);
-      } catch {
-        setTimetable([]);
-      }
-      setLoading(false);
-    };
     fetchTimetable();
   }, []);
 
@@ -74,6 +94,8 @@ const Timetable = () => {
                             {classItem.lecturer && (
                               <div className="text-gray-400 text-xs">Lecturer: {classItem.lecturer}</div>
                             )}
+                              <button onClick={() => handleDelete(classItem.id)} className="text-red-400 text-xs">Delete</button>
+
                           </div>
                         ) : null}
                       </td>

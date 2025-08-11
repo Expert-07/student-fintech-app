@@ -1,8 +1,7 @@
-
-
 import React, { useEffect } from "react";
 import "../css/Landing.css";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 // FontAwesome CDN for icons
 const fontAwesomeLink = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css";
 
@@ -59,8 +58,8 @@ const LandingPage = () => {
             <span className="ske">Student</span><span className="mart">Assist</span>
           </a>
           <ul className="nav-links">
-            <li><a href="" className="nav-link">Home</a></li>
-            <li><a href="" className="nav-link">Features</a></li>
+            <li><a href="/" className="nav-link">Home</a></li>
+            <li><a href="/edtech" className="nav-link">Features</a></li>
             <li><a href="" className="nav-link">Pricing</a></li>
             <li><a href="" className="nav-link">Contact</a></li>
             <div className="nav-buttons">
@@ -77,7 +76,7 @@ const LandingPage = () => {
       {/* Hero Section */}
       <section className="hero" style={{ marginTop: '80px' }}>
         <div className="container">
-          <h1>Transform Your <span>Academic Journey</span></h1>
+          <motion.h1>Transform Your <span>Academic Journey</span></motion.h1>
           <p>All-in-one platform for managing your studies, finances, and personal growth as a student</p>
           <div className="cta-buttons">
             <Link to="/register" className="btn" aria-label="Sign up for StudentAssist" style={{ textDecoration: 'none' }}>Get Started</Link>
@@ -104,6 +103,7 @@ const LandingPage = () => {
               <i className="fas fa-wallet"></i>
               <h3>Finance Tracker</h3>
               <p>Manage your budget, track expenses, and set savings goals to maintain financial stability.</p>
+              <Link to="/finance" className="btn btn-primary mt-2">Go to Finance Tracker</Link>
             </div>
             <div className="card slide-in">
               <i className="fas fa-chart-line"></i>
@@ -130,7 +130,7 @@ const LandingPage = () => {
                 </div>
                 <p>"StudentAssist completely transformed how I manage my studies and finances. The reading planner helped me stay on track with my textbooks, and the finance tracker saved me from overspending!"</p>
                 <div className="mt-3">
-                  <i class  Name="fas fa-star text-warning"></i>
+                  <i className  name="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>
@@ -148,7 +148,7 @@ const LandingPage = () => {
                 </div>
                 <p>"StudentAssist completely transformed how I manage my studies and finances. The reading planner helped me stay on track with my textbooks, and the finance tracker saved me from overspending!"</p>
                 <div className="mt-3">
-                  <i class  Name="fas fa-star text-warning"></i>
+                  <i className  name="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>
@@ -166,7 +166,7 @@ const LandingPage = () => {
                 </div>
                 <p>"StudentAssist completely transformed how I manage my studies and finances. The reading planner helped me stay on track with my textbooks, and the finance tracker saved me from overspending!"</p>
                 <div className="mt-3">
-                  <i class  Name="fas fa-star text-warning"></i>
+                  <i className  name="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>
@@ -210,7 +210,7 @@ const LandingPage = () => {
               <h5>Features</h5>
               <ul className="list-unstyled">
                 <li><a href="#" className="text-decoration-none text-muted">Academic Planner</a></li>
-                <li><a href="#" className="text-decoration-none text-muted">Finance Tracker</a></li>
+                <li><Link to="/finance" className="text-decoration-none text-muted">Finance Tracker</Link></li>
                 <li><a href="#" className="text-decoration-none text-muted">Goal Setting</a></li>
                 <li><a href="#" className="text-decoration-none text-muted">Progress Reports</a></li>
               </ul>

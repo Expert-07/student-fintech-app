@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+//import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FiMapPin, FiMessageSquare } from "react-icons/fi";
+//mport { FiMapPin, FiMessageSquare } from "react-icons/fi";
 import { MdInsertDriveFile } from "react-icons/md";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { FaRegCalendarAlt } from "react-icons/fa";

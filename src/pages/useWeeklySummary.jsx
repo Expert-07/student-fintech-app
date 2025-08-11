@@ -6,6 +6,7 @@ export default function useWeeklySummary() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let intervalId;
     const fetchSummary = async () => {
       try {
         const res = await fetch('http://localhost:5000/api/expenses/summary/weekly', {
@@ -24,6 +25,9 @@ export default function useWeeklySummary() {
     };
 
     fetchSummary();
+        intervalId = setInterval(fetchSummary, 600000); // Poll every 60 seconds
+
+    return () => clearInterval(intervalId);
   }, []);
 
   return { summary, loading };

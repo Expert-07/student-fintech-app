@@ -1,0 +1,360 @@
+import React, { useEffect, useRef, useState } from "react";
+import "../css/finance.css" ;
+//import { Link } from "react-router-dom";
+//import MonthlySummary from "./MonthlySummary";
+//import BudgetSuggestions from "./BudgetSuggestions";
+import Expenses from "./Expenses";
+import {jwtDecode} from "jwt-decode";
+import SideBar from "./SideBar";
+import useWeeklySummary from "./useWeeklySummary";
+import BudgetSuggestions from "./BudgetSuggestions";
+
+const expenseCategories = [
+  "Food & Dining",
+  "Transportation",
+  "Housing",
+  "Entertainment",
+  "Education",
+  "Shopping",
+  "Other",
+];
+
+export default function Finance() {
+  const spendingChartRef = useRef(null);
+  const incomeExpenseChartRef = useRef(null);
+  const [wallet, setWallet] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [showTopup, setShowTopup] = useState(false);
+  const [topupAmount, setTopupAmount] = useState("");
+  const [topupLoading, setTopupLoading] = useState(false);
+  const [topupError, setTopupError] = useState("");
+  // Top-up handler
+  const handleTopup = async (e) => {
+    e.preventDefault();
+    setTopupLoading(true);
+    setTopupError("");
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch("http://localhost:5000/api/wallet/topup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ amount: Number(topupAmount) }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Top-up failed");
+      setShowTopup(false);
+      setTopupAmount("");
+      fetchWallet(token);
+      alert("Wallet topped up successfully!");
+    } catch (err) {
+      setTopupError(err.message);
+    } finally {
+      setTopupLoading(false);
+    }
+  };
+  const [showBudgetModal, setShowBudgetModal] = useState(false);
+  const [budgetForm, setBudgetForm] = useState({ category: '', limit_amount: '' });
+  const [budgetLoading, setBudgetLoading] = useState(false);
+  const [budgetError, setBudgetError] = useState('');
+  // Handle budget form input
+  const handleBudgetChange = (e) => {
+    setBudgetForm({ ...budgetForm, [e.target.name]: e.target.value });
+  };
+
+  // Submit new budget
+  const handleBudgetSubmit = async (e) => {
+    e.preventDefault();
+    setBudgetLoading(true);
+    setBudgetError('');
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch('http://localhost:5000/api/budget', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          category: budgetForm.category,
+          limit_amount: Number(budgetForm.limit_amount),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to create budget');
+      setShowBudgetModal(false);
+      setBudgetForm({ category: '', limit_amount: '' });
+      // Optionally, refresh budgets here
+    } catch (err) {
+      setBudgetError(err.message);
+    } finally {
+      setBudgetLoading(false);
+    }
+  };
+
+
+   const { summary, loading: loadingWeekly } = useWeeklySummary();
+  console.log("Weekly summary:", summary);
+    
+  
+
+  useEffect(() => {
+    document.body.classList.add("finance-bg");
+    return () => document.body.classList.remove("finance-bg");
+  }, []);
+
+  // Chart.js logic placeholder
+  useEffect(() => {
+    // You can add Chart.js logic here using spendingChartRef and incomeExpenseChartRef
+  }, []);
+
+    useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+  
+      const decoded = jwtDecode(token);
+      setUserId(decoded.id);
+      //setUser(decoded);
+      fetchWallet(token);
+    }, []);
+
+
+  const fetchWallet = async (token) => {
+    try {
+      const res = await fetch("http://localhost:5000/api/wallet", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setWallet(data);
+      } else {
+        console.error("Error fetching wallet:", data.message);
+      }
+    } catch (err) {
+      console.error("Fetch wallet failed:", err);
+    }
+  };
+
+  return (
+    <div className="dashboard-layout">
+      {/* Sidebar Navigation */}
+<SideBar/>
+      {/* Main Content Area */}
+      <main className="main-content">
+        {/* Dashboard Header */}
+        <header className="dashboard-header">
+          <button className="menu-toggle" id="menuToggle">
+            <i className="fas fa-bars"></i>
+          </button>
+          <div className="search-bar" id="searchBar">
+            <i className="fas fa-search"></i>
+            <input type="text" placeholder="Search transactions..." />
+          </div>
+          <div className="search-profile">
+            <button className="search-toggle" id="searchToggle">
+              <i className="fas fa-search"></i>
+            </button>
+            <div className="profile-dropdown">
+              <div className="notification-badge">3</div>
+              <img src="https://ui-avatars.com/api/?name=Alex+Johnson&background=00ffff&color=121212" alt="Alex" />
+              <span>Satoru Gojo</span>
+              <i className="fas fa-chevron-down"></i>
+            </div>
+          </div>
+        </header>
+        {/* Finance Tracker Content */}
+        <div className="dashboard-content">
+          <div className="welcome-section fade-in">
+            <h1>Finance Tracker</h1>
+            <p>Manage your expenses, track your budget, and achieve your financial goals</p>
+          </div>
+          {/* Financial Overview */}
+          <div className="stats-grid">
+            <div className="stat-card fade-in">
+              <div className="stat-icon">
+                <i className="fas fa-wallet"></i>
+              </div>
+              <div className="stat-title">Total Balance</div>
+              <div className="stat-value">
+                {wallet
+                  ? `₦${Number(wallet.balance).toLocaleString('en-NG', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}`
+                  : "Loading..."}
+                <button className="ml-2 btn btn-xs btn-outline" onClick={() => setShowTopup(true)}>
+                  Top Up
+                </button>
+              </div>
+              <div className="stat-subtext">
+                {loadingWeekly && "Loading weekly spend..."}
+                {!loadingWeekly && summary && summary.totalSpent !== undefined && (
+                  <span>Spent this week: ₦{Number(summary.totalSpent).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                )}
+                {!loadingWeekly && (!summary || summary.totalSpent === undefined) && (
+                  <span>Weekly spend unavailable</span>
+                )}
+              </div>
+      {/* Top-up Modal */}
+      {showTopup && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3 className="text-lg font-bold mb-2">Top Up Wallet</h3>
+            <form onSubmit={handleTopup}>
+              <input
+                type="number"
+                min="1"
+                className="w-full p-2 border rounded mb-2"
+                placeholder="Enter amount (₦)"
+                value={topupAmount}
+                onChange={e => setTopupAmount(e.target.value)}
+                required
+              />
+              {topupError && <div className="text-red-600 mb-2">{topupError}</div>}
+              <div className="flex gap-2 mt-2">
+                <button type="submit" className="btn" disabled={topupLoading}>
+                  {topupLoading ? "Topping up..." : "Top Up"}
+                </button>
+                <button type="button" className="btn btn-outline" onClick={() => setShowTopup(false)}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+            </div>
+            <div className="stat-card fade-in">
+              <div className="stat-icon">
+                <i className="fas fa-arrow-up"></i>
+              </div>
+              <div className="stat-title">Monthly Income</div>
+              <div className="stat-value">$1,200</div>
+              <div className="stat-subtext">From part-time job</div>
+            </div>
+            <div className="stat-card fade-in">
+              <div className="stat-icon">
+                <i className="fas fa-arrow-down"></i>
+              </div>
+              <div className="stat-title">Monthly Expenses</div>
+              <div className="stat-value">$850</div>
+              <div className="stat-subtext">- $50 from last month</div>
+
+                              {loadingWeekly && "Loading weekly spend..."}
+                {!loadingWeekly && summary && summary.totalSpent !== undefined && (
+                  <span>Spent this week: ₦{Number(summary.totalSpent).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                )}
+                {!loadingWeekly && (!summary || summary.totalSpent === undefined) && (
+                  <span>Weekly spend unavailable</span>
+                )}
+            </div>
+            <div className="stat-card fade-in">
+              <div className="stat-icon">
+                <i className="fas fa-piggy-bank"></i>
+              </div>
+              <div className="stat-title">Savings Rate</div>
+              <div className="stat-value">29%</div>
+              <div className="stat-subtext">$350 saved this month</div>
+            </div>
+          </div>
+          <div className="finance-grid">
+            {/* Transactions */}
+<Expenses/>
+            {/* Budget Management */}
+            <div className="finance-section fade-in">
+              <div className="section-title">
+                <h2><i className="fas fa-chart-pie"></i> Budget Management</h2>
+                <button className="btn" onClick={() => setShowBudgetModal(true)}>
+                  <i className="fas fa-plus"></i> New Budget
+                </button>
+      {/* Budget Modal */}
+      {showBudgetModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3 className="text-lg font-bold mb-2">Create New Budget</h3>
+            <form onSubmit={handleBudgetSubmit}>
+              <div className="form-group mb-2">
+                <label htmlFor="budgetCategory">Category</label>
+                <select
+                  id="budgetCategory"
+                  name="category"
+                  value={budgetForm.category}
+                  onChange={handleBudgetChange}
+                  required
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="">Select category</option>
+                  {expenseCategories.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group mb-2">
+                <label htmlFor="budgetLimit">Limit Amount (₦)</label>
+                <input
+                  type="number"
+                  id="budgetLimit"
+                  name="limit_amount"
+                  value={budgetForm.limit_amount}
+                  onChange={handleBudgetChange}
+                  required
+                  className="w-full p-2 border rounded"
+                  min="0"
+                />
+              </div>
+              {budgetError && <div className="text-red-600 mb-2">{budgetError}</div>}
+              <div className="flex gap-2 mt-4">
+                <button type="submit" className="btn" disabled={budgetLoading}>
+                  {budgetLoading ? 'Saving...' : 'Save Budget'}
+                </button>
+                <button type="button" className="btn btn-outline" onClick={() => setShowBudgetModal(false)}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+              </div>
+<BudgetSuggestions/>
+            </div>
+            {/* Financial Charts */}
+            <div className="finance-section fade-in">
+              <div className="section-title">
+                <h2><i className="fas fa-chart-line"></i> Financial Analytics</h2>
+              </div>
+              <div className="chart-container">
+                <div className="chart-header">
+                  <h3>Spending by Category</h3>
+                  <select className="time-filter">
+                    <option>This Month</option>
+                    <option>Last Month</option>
+                    <option>Last 3 Months</option>
+                  </select>
+                </div>
+                <canvas ref={spendingChartRef} id="spendingChart"></canvas>
+              </div>
+              <div className="chart-container">
+                <div className="chart-header">
+                  <h3>Income vs Expenses</h3>
+                  <select className="time-filter">
+                    <option>Last 6 Months</option>
+                    <option>Last Year</option>
+                    <option>All Time</option>
+                  </select>
+                </div>
+                <canvas ref={incomeExpenseChartRef} id="incomeExpenseChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

@@ -4,26 +4,49 @@ import { FaGraduationCap, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSignInAlt, Fa
 import { Link, useNavigate } from "react-router-dom";
 
 export default function LoginTemplate() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
-      alert("Please fill in all fields");
-      return;
-    }
-    setLoading(true);
-    // Simulate login process (replace with real API call)
-    setTimeout(() => {
-      setLoading(false);
-      navigate("/dashboard");
-    }, 1500);
-  };
 
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      const responseData = await res.json();
+
+      if (!res.ok) {
+        alert(responseData.message || "Login failed");
+      } else {
+        console.log("Login successful. Token:", responseData.token);
+        console.log("Saved token: ", localStorage.getItem("token"));
+        
+        localStorage.setItem("token", responseData.token); // ✅ Store token
+        navigate("/dashboard"); // ✅ Navigate without reloading
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("Something went wrong.");
+    }
+
+    console.log("Logging in:", form);
+  };
   return (
     <div className="lt-login-bg">
       <div className="lt-container">
@@ -42,12 +65,13 @@ export default function LoginTemplate() {
                 <FaEnvelope />
               </div>
               <input
-                type="email"
+              type="email"
                 id="lt-email"
+                name="email"
                 className="lt-form-control"
                 placeholder="student@university.edu"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+            value={form.email}
+            onChange={handleChange}
                 required
               />
             </div>
@@ -59,10 +83,11 @@ export default function LoginTemplate() {
               <input
                 type={showPassword ? "text" : "password"}
                 id="lt-password"
+                name="password"
                 className="lt-form-control"
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+            value={form.password}
+            onChange={handleChange}
                 required
               />
               <span

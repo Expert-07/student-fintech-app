@@ -14,6 +14,7 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 import { BsBook } from "react-icons/bs";
 import ReminderSystem from "./SmartReminders";
 import BottomNav from "./BottomNav";
+import SideBar from "./SideBar";
 
 
 
@@ -273,8 +274,7 @@ export default function Dashboard() {
                 <Link to="/timetable" className="text-blue-400 hover:underline">
                   View timetable
                 </Link>
-    <Navbar />
-
+      <SideBar/>
     
     </div>
 

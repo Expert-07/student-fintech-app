@@ -33,7 +33,7 @@ export default function Login() {
         console.log("Saved token: ", localStorage.getItem("token"));
         
         localStorage.setItem("token", responseData.token); // ✅ Store token
-        navigate("/dashboardtemp"); // ✅ Navigate without reloading
+        navigate("/dashboard"); // ✅ Navigate without reloading
       }
     } catch (err) {
       console.error("Login error:", err);

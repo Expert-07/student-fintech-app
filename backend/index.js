@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-
+const compression = require('compression');
 const dontenv = require('dotenv');
 dontenv.config();
 
@@ -10,6 +10,8 @@ app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true,
 }));
+app.use(compression());//
+
 const authRoutes = require('./routes/auth');
 
 const walletRoutes = require('./routes/wallet');
@@ -34,6 +36,9 @@ app.use('/api/timetable', timetableRoutes);
 
 const reminderRoutes = require('./routes/reminderRoutes');
 app.use('/api/reminders', reminderRoutes);
+
+const budgetRoutes = require('./routes/budgetRoutes');  
+app.use('/api/budget', budgetRoutes);
 
 app.use('/api/timetable/upcoming', reminderRoutes);
 const PORT = process.env.PORT || 5000;
