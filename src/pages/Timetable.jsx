@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const timeSlots = [
@@ -9,6 +9,47 @@ const timeSlots = [
 const Timetable = () => {
   const [timetable, setTimetable] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const fileInputRef = useRef();
+  // Handle PDF upload
+  const handlePDFUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.type !== "application/pdf") {
+      setUploadError("Only PDF files are allowed.");
+      return;
+    }
+    setUploading(true);
+    setUploadError("");
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+    const formData = new FormData();
+    formData.append("pdf", file);
+    formData.append("userId", userId);
+    try {
+      const res = await fetch("http://localhost:5000/api/timetable/upload", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Upload failed");
+      alert("PDF uploaded successfully!");
+      // Optionally, refresh timetable or show link
+    } catch (err) {
+      setUploadError(err.message);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  // Handle clearing the file input and error
+  const handleClearFileInput = () => {
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setUploadError("");
+  };
 
   // Move fetchTimetable outside useEffect
   const fetchTimetable = async () => {
@@ -63,6 +104,33 @@ const Timetable = () => {
   return (
     <div className="max-w-5xl mx-auto p-4">
       <h2 className="text-2xl font-bold mb-6 text-center">Weekly Timetable</h2>
+      {/* PDF Upload Feature */}
+      <div className="mb-6 flex flex-col items-center">
+        <label className="mb-2 font-medium">Upload Timetable as PDF:</label>
+        <div className="flex items-center gap-2">
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={handlePDFUpload}
+            ref={fileInputRef}
+            className="mb-2"
+            disabled={uploading}
+          />
+          {/* Cancel/Clear button */}
+          <button
+            type="button"
+            onClick={handleClearFileInput}
+            className="mb-2 px-2 py-1 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 text-lg font-bold focus:outline-none"
+            title="Clear file input"
+            disabled={uploading}
+            style={{ lineHeight: 1 }}
+          >
+            ×
+          </button>
+        </div>
+        {uploading && <span className="text-blue-500">Uploading...</span>}
+        {uploadError && <span className="text-red-500">{uploadError}</span>}
+      </div>
       {loading ? (
         <p className="text-center">Loading timetable...</p>
       ) : (

@@ -20,7 +20,7 @@ export default function SideBar() {
               </Link>
             </li>
             <li>
-              <Link to="/edtech">
+              <Link to="/reading-planner">
                 <i className="fas fa-book-open"></i>
                 <span>Reading Planner</span>
               </Link>
@@ -29,6 +29,12 @@ export default function SideBar() {
               <Link to="/finance">
                 <i className="fas fa-wallet"></i>
                 <span>Finance Tracker</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/campus-map">
+                <i className="fas fa-map-marker-alt"></i>
+                <span>Campus Map</span>
               </Link>
             </li>
             <li>

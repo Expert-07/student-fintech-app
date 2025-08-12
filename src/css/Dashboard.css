@@ -1,19 +1,36 @@
 
         /* ===== GLOBAL STYLES ===== */
-        :root {
-            --primary: #00ffff;
-            --primary-light: #00e6e6;
-            --secondary: #0000ff;
-            --accent: #00ccff;
-            --success: #00ff99;
-            --warning: #ffcc00;
-            --danger: #ff3366;
-            --dark-bg: #121212;
-            --card-bg: #1a1a1a;
-            --text-color: #e0e0e0;
-            --text-secondary: #a0a0a0;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
+
+:root {
+    --primary: #00ffff;
+    --primary-light: #00e6e6;
+    --secondary: #0000ff;
+    --accent: #00ccff;
+    --success: #00ff99;
+    --warning: #ffcc00;
+    --danger: #ff3366;
+    --dark-bg: #121212;
+    --card-bg: #1a1a1a;
+    --text-color: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Light Theme Colors */
+:root.light-theme {
+    --primary: #0077ff;
+    --primary-light: #339dff;
+    --secondary: #00bcd4;
+    --accent: #ffb300;
+    --success: #43a047;
+    --warning: #ffb300;
+    --danger: #e53935;
+    --dark-bg: #f5f7fa;
+    --card-bg: #ffffff;
+    --text-color: #222b45;
+    --text-secondary: #7b809a;
+    --shadow: 0 4px 12px rgba(0, 119, 255, 0.08);
+}
 
         * {
             margin: 0;

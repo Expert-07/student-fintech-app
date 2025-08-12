@@ -1,16 +1,45 @@
 // src/components/BudgetSuggestions.jsx
 import React, { useEffect, useState } from 'react';
 
-
+// Animated progress bar as a child component to avoid hook errors
+function AnimatedProgressBar({ percent }) {
+  const [animatedPercent, setAnimatedPercent] = React.useState(percent);
+  React.useEffect(() => {
+    setAnimatedPercent(percent);
+  }, [percent]);
+  // Color logic matches parent
+  let color = '#00ccff';
+  let boxShadow = '0 0 8px #00ccff';
+  if (percent > 100) {
+    color = '#dc2626';
+    boxShadow = '0 0 8px #dc2626';
+  } else if (percent > 80) {
+    color = '#f59e42';
+    boxShadow = '0 0 8px #f59e42';
+  }
+  return (
+    <div className="progress-bar" style={{ background: '#e5e7eb', borderRadius: 8, overflow: 'hidden', height: 12 }}>
+      <div
+        className="progress-fill"
+        style={{
+          width: `${animatedPercent}%`,
+          background: color,
+          height: '100%',
+          borderRadius: 8,
+          transition: 'width 0.7s cubic-bezier(.4,2,.6,1)',
+          boxShadow
+        }}
+      ></div>
+    </div>
+  );
+}
 
 const BudgetSuggestions = () => {
-
   const [monthlySummary, setMonthlySummary] = useState(null);
   const [weeklySummary, setWeeklySummary] = useState(null);
   const [budgetLimits, setBudgetLimits] = useState({});
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem('token');
-
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -59,9 +88,6 @@ const BudgetSuggestions = () => {
     return summary.categoryBreakdown.map(item => {
       const spent = parseFloat(item.total);
       const catKey = item.category ? item.category.toLowerCase().trim() : '';
-      // Debug log
-      console.log('Budget categories:', Object.keys(budgetLimits));
-      console.log('Checking category:', catKey, 'Original:', item.category);
       const limit = budgetLimits[catKey] || 0;
 
       if (!limit || isNaN(limit)) return `No budget set for ${item.category} in this ${period}.`;
@@ -81,13 +107,10 @@ const BudgetSuggestions = () => {
   };
 
   return (
-    
-    <div className=" p-6 w-full max-w-md mx-auto mt-6">
-      
+    <div className="p-6 w-full max-w-md mx-auto mt-6">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
         Budget Suggestions
       </h2>
-
       {loading ? (
         <p className="text-gray-600 dark:text-gray-300">Loading...</p>
       ) : (
@@ -145,6 +168,7 @@ const BudgetSuggestions = () => {
             stateIcon = <i className="fas fa-check-circle me-1 text-success"></i>;
             stateColor = "text-success";
           }
+
           return (
             <div key={idx} className="budget-card fade-in">
               <div className="budget-header">
@@ -156,9 +180,7 @@ const BudgetSuggestions = () => {
                   <span>Spent: ₦{Number(spent).toLocaleString('en-NG', { minimumFractionDigits: 2 })}</span>
                   <span>Remaining: ₦{Number(remaining).toLocaleString('en-NG', { minimumFractionDigits: 2 })}</span>
                 </div>
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: `${Math.min(percent, 100)}%`, background: percent > 100 ? '#dc2626' : percent > 80 ? '#f59e42' : '#00ccff' }}></div>
-                </div>
+                <AnimatedProgressBar percent={percent} />
               </div>
               <div className={`budget-meta ${stateColor}`}>
                 <span>{stateIcon} {state}</span>
@@ -167,31 +189,30 @@ const BudgetSuggestions = () => {
           );
         })}
       </div>
-              <div className="section-title" style={{ marginTop: "2rem" }}>
-                <h2><i className="fas fa-bullseye"></i> Savings Goals</h2>
-              </div>
-              <div className="budget-card fade-in">
-                <div className="budget-header">
-                  <div className="budget-title">New Laptop Fund</div>
-                  <div className="budget-amount">$500</div>
-                </div>
-                <div className="progress-container">
-                  <div className="progress-info">
-                    <span>Saved: $325</span>
-                    <span>Remaining: $175</span>
-                  </div>
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: "65%" }}></div>
-                  </div>
-                </div>
-                <div className="budget-meta">
-                  <span><i className="fas fa-calendar me-1"></i> Target: Aug 30, 2023</span>
-                  <span><i className="fas fa-coins me-1"></i> $35/week</span>
-                </div>
-              </div>
+      {/* Example static savings goal card (optional, can be removed if not needed) */}
+      <div className="section-title" style={{ marginTop: "2rem" }}>
+        <h2><i className="fas fa-bullseye"></i> Savings Goals</h2>
+      </div>
+      <div className="budget-card fade-in">
+        <div className="budget-header">
+          <div className="budget-title">New Laptop Fund</div>
+          <div className="budget-amount">$500</div>
+        </div>
+        <div className="progress-container">
+          <div className="progress-info">
+            <span>Saved: $325</span>
+            <span>Remaining: $175</span>
+          </div>
+          <div className="progress-bar">
+            <div className="progress-fill" style={{ width: "65%" }}></div>
+          </div>
+        </div>
+        <div className="budget-meta">
+          <span><i className="fas fa-calendar me-1"></i> Target: Aug 30, 2023</span>
+          <span><i className="fas fa-coins me-1"></i> $35/week</span>
+        </div>
+      </div>
     </div>
-
-    
   );
 };
 

@@ -46,3 +46,6 @@ app.listen(PORT, () =>
     console.log(`Server running on port: " ${PORT}`)
     
 );
+
+const timetableUploadRouter = require('./routes/timetableUpload');
+app.use('/api/timetable', timetableUploadRouter);

@@ -62,10 +62,28 @@ const LandingPage = () => {
             <li><a href="/edtech" className="nav-link">Features</a></li>
             <li><a href="" className="nav-link">Pricing</a></li>
             <li><a href="" className="nav-link">Contact</a></li>
-            <div className="nav-buttons">
+          <div className="nav-buttons">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.96 }}
+              style={{ display: 'inline-block' }}
+            >
               <Link to="/login" className="btn" style={{height:'44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Login</Link>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.4 }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.96 }}
+              style={{ display: 'inline-block', marginLeft: '0.5rem' }}
+            >
               <Link to="/register" className="btn" style={{height:'44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Sign Up</Link>
-            </div>
+            </motion.div>
+          </div>
           </ul>
           <button className="hamburger" id="hamburger">
             <i className="fas fa-bars"></i>
@@ -76,11 +94,41 @@ const LandingPage = () => {
       {/* Hero Section */}
       <section className="hero" style={{ marginTop: '80px' }}>
         <div className="container">
-          <motion.h1>Transform Your <span>Academic Journey</span></motion.h1>
-          <p>All-in-one platform for managing your studies, finances, and personal growth as a student</p>
+          <motion.h1
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            Transform Your <span>Academic Journey</span>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          >
+            All-in-one platform for managing your studies, finances, and personal growth as a student
+          </motion.p>
           <div className="cta-buttons">
-            <Link to="/register" className="btn" aria-label="Sign up for StudentAssist" style={{ textDecoration: 'none' }}>Get Started</Link>
-            <button className="btn btn-outline" type="button">Explore Features</button>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.5 }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.96 }}
+              style={{ display: 'inline-block', marginRight: '0.5rem' }}
+            >
+              <Link to="/register" className="btn" aria-label="Sign up for StudentAssist" style={{ textDecoration: 'none' }}>Get Started</Link>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.6 }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.96 }}
+              style={{ display: 'inline-block' }}
+            >
+              <button className="btn btn-outline" type="button">Explore Features</button>
+            </motion.div>
           </div>
           <div style={{ marginTop: "3rem" }}>
             <i className="fas fa-arrow-down floating" style={{ fontSize: "2.5rem", color: "rgba(255,255,255,0.8)" }}></i>
@@ -89,21 +137,41 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      
       <section className="features">
         <div className="container">
-          <h2>Our <span>Features</span></h2>
+          <motion.h2
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            Our <span>Features</span>
+          </motion.h2>
           <div className="feature-cards">
             <div className="card slide-in">
+              <Link to="/edtech" className="card-link">
+
               <i className="fas fa-book"></i>
               <h3>Academic Planner</h3>
               <p>Organize your courses, track reading progress, and manage assignments with our powerful academic tools.</p>
+            </Link>
+
             </div>
             <div className="card slide-in">
               <i className="fas fa-wallet"></i>
               <h3>Finance Tracker</h3>
               <p>Manage your budget, track expenses, and set savings goals to maintain financial stability.</p>
-              <Link to="/finance" className="btn btn-primary mt-2">Go to Finance Tracker</Link>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, delay: 0.2 }}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.96 }}
+                style={{ display: 'inline-block' }}
+              >
+                <Link to="/finance" className="btn btn-primary mt-2">Go to Finance Tracker</Link>
+              </motion.div>
             </div>
             <div className="card slide-in">
               <i className="fas fa-chart-line"></i>
@@ -117,7 +185,15 @@ const LandingPage = () => {
       {/* Testimonials Section */}
       <section className="section" style={{ background: "var(--card-bg)" }}>
         <div className="container">
-          <h2 className="testimonials">What Students <span>Say</span></h2>
+          <motion.h2
+            className="testimonials"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            What Students <span>Say</span>
+          </motion.h2>
           <div className="row justify-content-center">
             <div className="col-md-8 flex">
               <div className="card">
@@ -181,11 +257,31 @@ const LandingPage = () => {
       {/* Call to Action */}
       <section className="section" style={{ background: "linear-gradient(135deg, var(--primary), var(--secondary))" }}>
         <div className="container">
-          <h2 style={{ color: "white" }}>Ready to Transform Your Student Life?</h2>
+          <motion.h2
+            style={{ color: "white" }}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            Ready to Transform Your Student Life?
+          </motion.h2>
           <p className="mb-4" style={{ maxWidth: 600, margin: "0 auto", color: "rgba(255,255,255,0.9)" }}>
             Join thousands of students who are already achieving academic and financial success with StudentAssist.
           </p>
-          <a href="#" className="btn" style={{ background: "#121212", color: "var(--primary)" }}>Create Your Free Account</a>
+          <motion.a
+            href="#"
+            className="btn"
+            style={{ background: "#121212", color: "var(--primary)" }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.96 }}
+          >
+            Create Your Free Account
+          </motion.a>
         </div>
       </section>
 
@@ -229,7 +325,17 @@ const LandingPage = () => {
               <p>Subscribe to get tips and updates on student success.</p>
               <div className="input-group">
                 <input type="email" className="form-control" placeholder="Your email" style={{ background: "var(--card-bg)", border: "1px solid #2d2d2d", color: "var(--text-color)" }} />
-                <button className="btn btn-primary">Subscribe</button>
+                <motion.button
+                  className="btn btn-primary"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.7, delay: 0.2 }}
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.96 }}
+                >
+                  Subscribe
+                </motion.button>
               </div>
             </div>
           </div>

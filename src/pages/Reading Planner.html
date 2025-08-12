@@ -1,0 +1,616 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Success Hub | Reading Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3a56d4;
+            --accent: #4cc9f0;
+            --success: #38b000;
+            --warning: #ff9e00;
+            --light-bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --text-secondary: #6c757d;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --light-bg: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, #4a6cf7, #6a5af9);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        /* Book Card */
+        .book-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .book-cover {
+            height: 220px;
+            background: linear-gradient(135deg, #6a5af9, #4a6cf7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .book-info {
+            padding: 1.5rem;
+        }
+
+        /* Chapter List */
+        .chapter-list {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            height: 100%;
+        }
+
+        .chapter-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chapter-item:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .chapter-item.active {
+            background-color: rgba(67, 97, 238, 0.1);
+            border-left: 4px solid var(--primary);
+        }
+
+        .chapter-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        /* Reading Tools */
+        .reading-tools {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+
+        .timer-container {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .timer-display {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            font-family: monospace;
+        }
+
+        .timer-controls .btn {
+            margin: 0 5px;
+        }
+
+        /* Progress Section */
+        .progress-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+
+        .progress-container {
+            margin: 1.2rem 0;
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+        }
+        
+        .progress-bar-reading {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        /* Notes Section */
+        .notes-section {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+
+        .note-card {
+            background-color: rgba(67, 97, 238, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--primary);
+        }
+
+        .note-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 2rem 0;
+            }
+            
+            .timer-display {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-graduation-cap me-2"></i>StudentHub
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-home me-1"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="fas fa-book-open me-1"></i> Reading</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-wallet me-1"></i> Finance</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-chart-line me-1"></i> Progress</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i> Alex
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <div class="header-content">
+                <h1><i class="fas fa-book-open me-2"></i>Reading Planner</h1>
+                <p class="lead">Organize your academic reading, track progress, and achieve your learning goals</p>
+                <div class="mt-4">
+                    <button class="btn btn-light me-2">
+                        <i class="fas fa-plus me-1"></i> Add New Book
+                    </button>
+                    <button class="btn btn-outline-light">
+                        <i class="fas fa-file-pdf me-1"></i> Import PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <!-- Left Column: Book & Chapters -->
+            <div class="col-lg-4 mb-4">
+                <div class="book-card">
+                    <div class="book-cover">
+                        <i class="fas fa-book fa-5x"></i>
+                    </div>
+                    <div class="book-info">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3>Computer Science Textbook</h3>
+                                <p class="text-muted">Advanced Concepts for Undergraduates</p>
+                            </div>
+                            <span class="badge bg-primary">Active</span>
+                        </div>
+                        
+                        <div class="progress-container mt-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small>Progress: 78%</small>
+                                <small>Chapters: 5/7</small>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-reading" style="width: 78%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span><i class="fas fa-calendar me-1"></i> Start Date: Jun 10, 2023</span>
+                                <span><i class="fas fa-flag me-1"></i> Deadline: Jul 15, 2023</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span><i class="fas fa-fire me-1 text-danger"></i> 5 day streak</span>
+                                <span><i class="fas fa-bullseye me-1"></i> 20 pages/day</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chapter-list mt-4">
+                    <h4 class="mb-3"><i class="fas fa-list-ol me-2"></i>Chapters</h4>
+                    
+                    <div class="chapter-item active">
+                        <div class="chapter-number">1</div>
+                        <div>
+                            <h6 class="mb-0">Introduction to Programming</h6>
+                            <small class="text-success">Completed</small>
+                        </div>
+                    </div>
+                    
+                    <div class="chapter-item active">
+                        <div class="chapter-number">2</div>
+                        <div>
+                            <h6 class="mb-0">Data Structures</h6>
+                            <small class="text-success">Completed</small>
+                        </div>
+                    </div>
+                    
+                    <div class="chapter-item active">
+                        <div class="chapter-number">3</div>
+                        <div>
+                            <h6 class="mb-0">Algorithms</h6>
+                            <small class="text-success">Completed</small>
+                        </div>
+                    </div>
+                    
+                    <div class="chapter-item active">
+                        <div class="chapter-number">4</div>
+                        <div>
+                            <h6 class="mb-0">Object-Oriented Design</h6>
+                            <small class="text-success">Completed</small>
+                        </div>
+                    </div>
+                    
+                    <div class="chapter-item active">
+                        <div class="chapter-number">5</div>
+                        <div>
+                            <h6 class="mb-0">Database Systems</h6>
+                            <small class="text-warning">In Progress (80%)</small>
+                        </div>
+                    </div>
+                    
+                    <div class="chapter-item">
+                        <div class="chapter-number">6</div>
+                        <div>
+                            <h6 class="mb-0">Web Technologies</h6>
+                            <small class="text-muted">Not Started</small>
+                        </div>
+                    </div>
+                    
+                    <div class="chapter-item">
+                        <div class="chapter-number">7</div>
+                        <div>
+                            <h6 class="mb-0">Software Engineering</h6>
+                            <small class="text-muted">Not Started</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Reading Tools & Progress -->
+            <div class="col-lg-8 mb-4">
+                <div class="reading-tools">
+                    <div class="row">
+                        <div class="col-md-6 mb-4 mb-md-0">
+                            <h4><i class="fas fa-clock me-2"></i>Reading Timer</h4>
+                            <div class="timer-container">
+                                <p>Current Session</p>
+                                <div class="timer-display" id="timer">25:00</div>
+                                <div class="timer-controls">
+                                    <button class="btn btn-light" id="startBtn">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                    <button class="btn btn-light" id="pauseBtn">
+                                        <i class="fas fa-pause"></i>
+                                    </button>
+                                    <button class="btn btn-light" id="resetBtn">
+                                        <i class="fas fa-redo"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <h5>Session Goal</h5>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" value="20" min="1" max="100">
+                                    <span class="input-group-text">pages</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h4><i class="fas fa-tasks me-2"></i>Today's Progress</h4>
+                            <div class="progress-card">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">Database Systems</h5>
+                                    <span class="badge bg-primary">Chapter 5</span>
+                                </div>
+                                <p class="text-muted">Pages 120-145: Relational Database Design</p>
+                                
+                                <div class="progress-container">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small>Pages: 8/20</small>
+                                        <small>40%</small>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-reading" style="width: 40%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <button class="btn btn-primary w-100">
+                                        <i class="fas fa-check-circle me-1"></i> Complete Session
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="notes-section mt-4">
+                    <h4><i class="fas fa-sticky-note me-2"></i>Chapter Notes</h4>
+                    
+                    <div class="note-card">
+                        <div class="note-date">Today, 10:30 AM</div>
+                        <p>Relational algebra forms the basis of relational database operations. Key operations: selection, projection, union, set difference, Cartesian product.</p>
+                    </div>
+                    
+                    <div class="note-card">
+                        <div class="note-date">Yesterday, 4:15 PM</div>
+                        <p>Normalization is the process of organizing data to reduce redundancy. Important normal forms: 1NF, 2NF, 3NF, BCNF.</p>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Add new note...">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid mt-4">
+                    <div class="stat-card">
+                        <i class="fas fa-book fa-2x mb-2"></i>
+                        <div class="stat-value">78%</div>
+                        <div class="stat-label">Overall Progress</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <i class="fas fa-fire fa-2x mb-2"></i>
+                        <div class="stat-value">14</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <i class="fas fa-tachometer-alt fa-2x mb-2"></i>
+                        <div class="stat-value">18.3</div>
+                        <div class="stat-label">Pages/Day</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                        <div class="stat-value">32</div>
+                        <div class="stat-label">Sessions</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Timer functionality
+            const timerDisplay = document.getElementById('timer');
+            const startBtn = document.getElementById('startBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            
+            let timerInterval;
+            let minutes = 25;
+            let seconds = 0;
+            let isRunning = false;
+            
+            function updateTimer() {
+                seconds--;
+                if (seconds < 0) {
+                    minutes--;
+                    seconds = 59;
+                }
+                
+                if (minutes < 0) {
+                    clearInterval(timerInterval);
+                    minutes = 25;
+                    seconds = 0;
+                    isRunning = false;
+                    alert('Reading session completed! Great job!');
+                }
+                
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            startBtn.addEventListener('click', function() {
+                if (!isRunning) {
+                    timerInterval = setInterval(updateTimer, 1000);
+                    isRunning = true;
+                }
+            });
+            
+            pauseBtn.addEventListener('click', function() {
+                if (isRunning) {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                }
+            });
+            
+            resetBtn.addEventListener('click', function() {
+                clearInterval(timerInterval);
+                minutes = 25;
+                seconds = 0;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                isRunning = false;
+            });
+            
+            // Chapter selection
+            const chapterItems = document.querySelectorAll('.chapter-item');
+            chapterItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    chapterItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update the chapter in the progress section
+                    const chapterNumber = this.querySelector('.chapter-number').textContent;
+                    const chapterTitle = this.querySelector('h6').textContent;
+                    
+                    document.querySelector('.progress-card h5').textContent = chapterTitle;
+                    document.querySelector('.progress-card .badge').textContent = `Chapter ${chapterNumber}`;
+                });
+            });
+            
+            // Theme toggle functionality
+            const themeToggle = document.createElement('button');
+            themeToggle.className = 'btn btn-sm btn-outline-secondary position-fixed bottom-3 end-3 rounded-pill';
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            themeToggle.style.zIndex = '1000';
+            document.body.appendChild(themeToggle);
+
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                themeToggle.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+                
+                // Animation
+                themeToggle.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    themeToggle.style.transform = 'scale(1)';
+                }, 200);
+            });
+        });
+    </script>
+</body>
+</html>
+``

@@ -243,8 +243,18 @@ export default function Finance() {
                 <i className="fas fa-arrow-down"></i>
               </div>
               <div className="stat-title">Monthly Expenses</div>
-              <div className="stat-value">$850</div>
-              <div className="stat-subtext">- $50 from last month</div>
+              <div className="stat-value">
+                {/* Dynamically show total monthly expenses in Naira */}
+                {loadingWeekly ? 'Loading...' : summary && summary.totalSpent !== undefined
+                  ? `₦${Number(summary.totalSpent).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                  : 'Unavailable'}
+              </div>
+              <div className="stat-subtext">
+                {/* Optionally, show delta from last month if available */}
+                {summary && summary.deltaFromLastMonth !== undefined
+                  ? `${summary.deltaFromLastMonth >= 0 ? '+' : ''}₦${Number(summary.deltaFromLastMonth).toLocaleString('en-NG', { minimumFractionDigits: 2 })} from last month`
+                  : ''}
+              </div>
 
                               {loadingWeekly && "Loading weekly spend..."}
                 {!loadingWeekly && summary && summary.totalSpent !== undefined && (

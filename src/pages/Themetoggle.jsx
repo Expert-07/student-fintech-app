@@ -10,9 +10,11 @@ const ThemeToggle = () => {
     const root = window.document.documentElement;
     if (darkMode) {
       root.classList.add("dark");
+      root.classList.remove("light-theme");
       localStorage.setItem("theme", "dark");
     } else {
       root.classList.remove("dark");
+      root.classList.add("light-theme");
       localStorage.setItem("theme", "light");
     }
   }, [darkMode]);

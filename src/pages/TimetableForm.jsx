@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const TimetableForm = () => {
+const TimetableForm = ({ onClose }) => {
   const [form, setForm] = useState({
     course_name: '',
     day_of_the_week: '',
@@ -48,7 +48,18 @@ const TimetableForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 max-w-md mx-auto bg-white rounded shadow">
+    <form onSubmit={handleSubmit} className="relative text-black space-y-4 p-4 max-w-md mx-auto bg-white rounded shadow">
+      {/* Close button */}
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-2 right-3 text-gray-500 hover:text-red-500 text-2xl font-bold focus:outline-none"
+          title="Close"
+        >
+          ×
+        </button>
+      )}
       <h2 className="text-xl font-bold">Add Timetable Entry</h2>
 
       <input
