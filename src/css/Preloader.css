@@ -1,8 +1,22 @@
+:root {
+    --primary: #00ffff;
+    --primary-light: #00e6e6;
+    --secondary: #0000ff;
+    --accent: #00ccff;
+    --success: #00ff99;
+    --warning: #ffcc00;
+    --danger: #ff3366;
+    --dark-bg: #121212;
+    --card-bg: #1a1a1a;
+    --text-color: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
 .preloader-bg {
   position: fixed;
   z-index: 9999;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(135deg, #00fff0 0%, #1e293b 100%);
+  background-color: var(--dark-bg);
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -165,7 +165,7 @@ const Expenses = () => {
               placeholder="Category"
               value={form.category}
               onChange={handleChange}>
-              <option value="food">Food & Dining</option>
+              <option value="food">Food</option>
               <option value="transport">Transportation</option>
               <option value="housing">Housing</option>
               <option value="entertainment">Entertainment</option>
@@ -203,7 +203,7 @@ const Expenses = () => {
             </div>
             <div className="transaction-details">
               <div className="transaction-title">Campus Cafe</div>
-              <div className="transaction-category">Food & Dining</div>
+              <div className="transaction-category">Food</div>
               <div className="transaction-meta">
                 <div className="transaction-amount">-$12.50</div>
                 <div className="transaction-date">Today, 12:30 PM</div>

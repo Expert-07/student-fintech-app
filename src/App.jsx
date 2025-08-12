@@ -8,7 +8,7 @@ import ThemeToggle from "./pages/Themetoggle"
 import NotificationBanner from "./components/NotificationBanner"
 import RegisterTemplate from "./pages/RegisterTemplate";
 const LandingPage = lazy(() => import("./pages/LandingPage"));
-const Register = lazy(() => import("./pages/Register"));
+//const Register = lazy(() => import("./pages/Register"));
 const DashboardTemplate = lazy(() => import("./pages/DashboardTemplate"));
 const LoginTemplate = lazy(() => import("./pages/LoginTemplate"));
 const Expenses = lazy(() => import("./pages/Expenses"));

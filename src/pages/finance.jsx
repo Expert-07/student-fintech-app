@@ -10,7 +10,7 @@ import useWeeklySummary from "./useWeeklySummary";
 import BudgetSuggestions from "./BudgetSuggestions";
 
 const expenseCategories = [
-  "Food & Dining",
+  "Food",
   "Transportation",
   "Housing",
   "Entertainment",
@@ -188,7 +188,7 @@ export default function Finance() {
                       maximumFractionDigits: 2,
                     })}`
                   : "Loading..."}
-                <button className="ml-2 btn btn-xs btn-outline" onClick={() => setShowTopup(true)}>
+                <button className="ml-1 text-2xl h-[50px] btn btn-outline" onClick={() => setShowTopup(true)}>
                   Top Up
                 </button>
               </div>
@@ -210,7 +210,7 @@ export default function Finance() {
               <input
                 type="number"
                 min="1"
-                className="w-full p-2 border rounded mb-2"
+                className="w-full p-2 border rounded mb-2 text-red-100 "
                 placeholder="Enter amount (₦)"
                 value={topupAmount}
                 onChange={e => setTopupAmount(e.target.value)}
@@ -280,7 +280,7 @@ export default function Finance() {
             <div className="finance-section fade-in">
               <div className="section-title">
                 <h2><i className="fas fa-chart-pie"></i> Budget Management</h2>
-                <button className="btn" onClick={() => setShowBudgetModal(true)}>
+                <button className="btn ml-6" onClick={() => setShowBudgetModal(true)}>
                   <i className="fas fa-plus"></i> New Budget
                 </button>
       {/* Budget Modal */}

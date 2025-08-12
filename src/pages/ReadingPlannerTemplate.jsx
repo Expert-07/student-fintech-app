@@ -1,63 +1,13 @@
 import React from "react";
 import "../css/reading.css";
+import SideBar from "./SideBar";
 // NOTE: Make sure to import the CSS from reading (all in one).html in your main index.html or as a separate CSS file for pixel-perfect styling.
 
 export default function ReadingPlannerTemplate() {
   return (
     <div className="dashboard-layout">
       {/* Sidebar Navigation */}
-      <aside className="sidebar" id="sidebar">
-        <div className="logo">
-          <i className="fas fa-graduation-cap"></i>
-          <span className="ske">Student</span><span className="mart">Hub</span>
-        </div>
-        <nav className="dashboard-nav">
-          <ul>
-            <li>
-              <a href="#">
-                <i className="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-              </a>
-            </li>
-            <li>
-              <a href="#" className="active">
-                <i className="fas fa-book-open"></i>
-                <span>Reading Planner</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fas fa-wallet"></i>
-                <span>Finance Tracker</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fas fa-chart-line"></i>
-                <span>Progress Reports</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fas fa-user"></i>
-                <span>Profile</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fas fa-cog"></i>
-                <span>Settings</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </aside>
+<SideBar/>
       {/* Main Content Area */}
       <main className="main-content">
         {/* Dashboard Header */}

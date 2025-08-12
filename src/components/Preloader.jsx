@@ -8,7 +8,7 @@ export default function Preloader() {
         <div className="preloader-glow"></div>
         <div className="preloader-dot"></div>
       </div>
-      <div className="preloader-text">Student Fintech</div>
+      <div className="preloader-text">Student Assist</div>
     </div>
   );
 }

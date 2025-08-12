@@ -7,7 +7,7 @@ export default function SideBar() {
 
         <div className="logo">
           <i className="fas fa-graduation-cap"></i>
-          <span className="ske">Student</span>
+          <span className="text-blue dark:text-white">Student</span>
           <span className="mart">Assist</span>
         </div>
         <nav className="dashboard-nav">

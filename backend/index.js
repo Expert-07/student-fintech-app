@@ -47,5 +47,5 @@ app.listen(PORT, () =>
     
 );
 
-const timetableUploadRouter = require('./routes/timetableUpload');
-app.use('/api/timetable', timetableUploadRouter);
+/*const timetableUploadRouter = require('./routes/timetableUpload');
+app.use('/api/timetable', timetableUploadRouter);*/
