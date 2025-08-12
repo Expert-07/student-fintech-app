@@ -1,3 +1,36 @@
+// Get savings rate for the current month
+exports.getMonthlySavingsRate = async (req, res) => {
+  const dayjs = require('dayjs');
+  const userId = req.user.id;
+  const startOfMonth = dayjs().startOf('month').format('YYYY-MM-DD');
+  const endOfMonth = dayjs().endOf('month').format('YYYY-MM-DD');
+  try {
+    // Get total income for the month
+    const incomeResult = await db.query(
+      `SELECT COALESCE(SUM(amount),0) AS total_income FROM incomes WHERE user_id = $1 AND created_at BETWEEN $2 AND $3`,
+      [userId, startOfMonth, endOfMonth]
+    );
+    // Get total expenses for the month
+    const expenseResult = await db.query(
+      `SELECT COALESCE(SUM(amount),0) AS total_expenses FROM expenses WHERE user_id = $1 AND created_at BETWEEN $2 AND $3`,
+      [userId, startOfMonth, endOfMonth]
+    );
+    const totalIncome = parseFloat(incomeResult.rows[0].total_income);
+    const totalExpenses = parseFloat(expenseResult.rows[0].total_expenses);
+    let savingsRate = 0;
+    if (totalIncome > 0) {
+      savingsRate = ((totalIncome - totalExpenses) / totalIncome) * 100;
+    }
+    res.status(200).json({
+      totalIncome,
+      totalExpenses,
+      savingsRate: Math.max(0, Math.round(savingsRate)),
+    });
+  } catch (error) {
+    console.error('Error calculating savings rate:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 const db = require('../db');
 
 //Add an expense

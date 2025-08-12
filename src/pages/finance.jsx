@@ -28,14 +28,21 @@ export default function Finance() {
   const [topupAmount, setTopupAmount] = useState("");
   const [topupLoading, setTopupLoading] = useState(false);
   const [topupError, setTopupError] = useState("");
-  // Top-up handler
+  const [savingsRate, setSavingsRate] = useState(null);
+  const [savingsRateLoading, setSavingsRateLoading] = useState(true);
+  const [savingsRateError, setSavingsRateError] = useState("");
+  const [monthlyIncome, setMonthlyIncome] = useState(null);
+  const [monthlyIncomeLoading, setMonthlyIncomeLoading] = useState(true);
+  const [monthlyIncomeError, setMonthlyIncomeError] = useState("");
+
+  // Top-up handler (now adds to incomes table, not wallet)
   const handleTopup = async (e) => {
     e.preventDefault();
     setTopupLoading(true);
     setTopupError("");
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch("http://localhost:5000/api/wallet/topup", {
+      const res = await fetch("http://localhost:5000/api/incomes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,11 +51,12 @@ export default function Finance() {
         body: JSON.stringify({ amount: Number(topupAmount) }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Top-up failed");
+      if (!res.ok) throw new Error(data.message || "Add income failed");
       setShowTopup(false);
       setTopupAmount("");
-      fetchWallet(token);
-      alert("Wallet topped up successfully!");
+      // Refresh monthly income after adding new income
+      fetchMonthlyIncome();
+      alert("Income added successfully!");
     } catch (err) {
       setTopupError(err.message);
     } finally {
@@ -141,10 +149,55 @@ export default function Finance() {
     }
   };
 
+  // Fetch savings rate
+  useEffect(() => {
+    const fetchSavingsRate = async () => {
+      setSavingsRateLoading(true);
+      setSavingsRateError("");
+      const token = localStorage.getItem("token");
+      try {
+        const res = await fetch("http://localhost:5000/api/expenses/summary/savings-rate", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to fetch savings rate");
+        setSavingsRate(data.savingsRate);
+      } catch (err) {
+        setSavingsRateError(err.message);
+      } finally {
+        setSavingsRateLoading(false);
+      }
+    };
+    fetchSavingsRate();
+  }, []);
+
+  // Fetch monthly income
+  const fetchMonthlyIncome = async () => {
+    setMonthlyIncomeLoading(true);
+    setMonthlyIncomeError("");
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch("http://localhost:5000/api/incomes/monthly", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to fetch monthly income");
+      setMonthlyIncome(data.totalIncome);
+    } catch (err) {
+      setMonthlyIncomeError(err.message);
+    } finally {
+      setMonthlyIncomeLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMonthlyIncome();
+  }, []);
+
   return (
     <div className="dashboard-layout">
       {/* Sidebar Navigation */}
-<SideBar/>
+      <SideBar/>
       {/* Main Content Area */}
       <main className="main-content">
         {/* Dashboard Header */}
@@ -188,9 +241,6 @@ export default function Finance() {
                       maximumFractionDigits: 2,
                     })}`
                   : "Loading..."}
-                <button className="ml-1 text-2xl h-[50px] btn btn-outline" onClick={() => setShowTopup(true)}>
-                  Top Up
-                </button>
               </div>
               <div className="stat-subtext">
                 {loadingWeekly && "Loading weekly spend..."}
@@ -201,42 +251,51 @@ export default function Finance() {
                   <span>Weekly spend unavailable</span>
                 )}
               </div>
-      {/* Top-up Modal */}
-      {showTopup && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3 className="text-lg font-bold mb-2">Top Up Wallet</h3>
-            <form onSubmit={handleTopup}>
-              <input
-                type="number"
-                min="1"
-                className="w-full p-2 border rounded mb-2 text-red-100 "
-                placeholder="Enter amount (₦)"
-                value={topupAmount}
-                onChange={e => setTopupAmount(e.target.value)}
-                required
-              />
-              {topupError && <div className="text-red-600 mb-2">{topupError}</div>}
-              <div className="flex gap-2 mt-2">
-                <button type="submit" className="btn" disabled={topupLoading}>
-                  {topupLoading ? "Topping up..." : "Top Up"}
-                </button>
-                <button type="button" className="btn btn-outline" onClick={() => setShowTopup(false)}>
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
             </div>
             <div className="stat-card fade-in">
               <div className="stat-icon">
                 <i className="fas fa-arrow-up"></i>
               </div>
               <div className="stat-title">Monthly Income</div>
-              <div className="stat-value">$1,200</div>
-              <div className="stat-subtext">From part-time job</div>
+              <div className="stat-value">
+                {monthlyIncomeLoading ? "Loading..." :
+                  monthlyIncome !== null ? `₦${Number(monthlyIncome).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "Unavailable"}
+                <button className="ml-1 text-2xl h-[50px] btn btn-outline" onClick={() => setShowTopup(true)}>
+                  Top Up
+                </button>
+              </div>
+              <div className="stat-subtext">
+                {monthlyIncomeError && <span className="text-red-600">{monthlyIncomeError}</span>}
+                {/* Optionally, show income source or analytics here */}
+              </div>
+              {/* Top-up Modal */}
+              {showTopup && (
+                <div className="modal-overlay">
+                  <div className="modal-content">
+                    <h3 className="text-lg font-bold mb-2">Add Income</h3>
+                    <form onSubmit={handleTopup}>
+                      <input
+                        type="number"
+                        min="1"
+                        className="w-full p-2 border rounded mb-2 text-red-100 "
+                        placeholder="Enter amount (₦)"
+                        value={topupAmount}
+                        onChange={e => setTopupAmount(e.target.value)}
+                        required
+                      />
+                      {topupError && <div className="text-red-600 mb-2">{topupError}</div>}
+                      <div className="flex gap-2 mt-2">
+                        <button type="submit" className="btn" disabled={topupLoading}>
+                          {topupLoading ? "Adding..." : "Add Income"}
+                        </button>
+                        <button type="button" className="btn btn-outline" onClick={() => setShowTopup(false)}>
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="stat-card fade-in">
               <div className="stat-icon">
@@ -254,28 +313,33 @@ export default function Finance() {
                 {summary && summary.deltaFromLastMonth !== undefined
                   ? `${summary.deltaFromLastMonth >= 0 ? '+' : ''}₦${Number(summary.deltaFromLastMonth).toLocaleString('en-NG', { minimumFractionDigits: 2 })} from last month`
                   : ''}
-              </div>
-
-                              {loadingWeekly && "Loading weekly spend..."}
+                {loadingWeekly && "Loading weekly spend..."}
                 {!loadingWeekly && summary && summary.totalSpent !== undefined && (
                   <span>Spent this week: ₦{Number(summary.totalSpent).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 )}
                 {!loadingWeekly && (!summary || summary.totalSpent === undefined) && (
                   <span>Weekly spend unavailable</span>
                 )}
+              </div>
             </div>
             <div className="stat-card fade-in">
               <div className="stat-icon">
                 <i className="fas fa-piggy-bank"></i>
               </div>
               <div className="stat-title">Savings Rate</div>
-              <div className="stat-value">29%</div>
-              <div className="stat-subtext">$350 saved this month</div>
+              <div className="stat-value">
+                {savingsRateLoading ? "Loading..." :
+                  savingsRate !== null ? `${savingsRate}%` : "Unavailable"}
+              </div>
+              <div className="stat-subtext">
+                {savingsRateError && <span className="text-red-600">{savingsRateError}</span>}
+                {/* Optionally, show more info here */}
+              </div>
             </div>
           </div>
           <div className="finance-grid">
             {/* Transactions */}
-<Expenses/>
+            <Expenses/>
             {/* Budget Management */}
             <div className="finance-section fade-in">
               <div className="section-title">
@@ -283,56 +347,56 @@ export default function Finance() {
                 <button className="btn ml-6" onClick={() => setShowBudgetModal(true)}>
                   <i className="fas fa-plus"></i> New Budget
                 </button>
-      {/* Budget Modal */}
-      {showBudgetModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3 className="text-lg font-bold mb-2">Create New Budget</h3>
-            <form onSubmit={handleBudgetSubmit}>
-              <div className="form-group mb-2">
-                <label htmlFor="budgetCategory">Category</label>
-                <select
-                  id="budgetCategory"
-                  name="category"
-                  value={budgetForm.category}
-                  onChange={handleBudgetChange}
-                  required
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Select category</option>
-                  {expenseCategories.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
+                {/* Budget Modal */}
+                {showBudgetModal && (
+                  <div className="modal-overlay">
+                    <div className="modal-content">
+                      <h3 className="text-lg font-bold mb-2">Create New Budget</h3>
+                      <form onSubmit={handleBudgetSubmit}>
+                        <div className="form-group mb-2">
+                          <label htmlFor="budgetCategory">Category</label>
+                          <select
+                            id="budgetCategory"
+                            name="category"
+                            value={budgetForm.category}
+                            onChange={handleBudgetChange}
+                            required
+                            className="w-full p-2 border rounded"
+                          >
+                            <option value="">Select category</option>
+                            {expenseCategories.map((cat) => (
+                              <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="form-group mb-2">
+                          <label htmlFor="budgetLimit">Limit Amount (₦)</label>
+                          <input
+                            type="number"
+                            id="budgetLimit"
+                            name="limit_amount"
+                            value={budgetForm.limit_amount}
+                            onChange={handleBudgetChange}
+                            required
+                            className="w-full p-2 border rounded"
+                            min="0"
+                          />
+                        </div>
+                        {budgetError && <div className="text-red-600 mb-2">{budgetError}</div>}
+                        <div className="flex gap-2 mt-4">
+                          <button type="submit" className="btn" disabled={budgetLoading}>
+                            {budgetLoading ? 'Saving...' : 'Save Budget'}
+                          </button>
+                          <button type="button" className="btn btn-outline" onClick={() => setShowBudgetModal(false)}>
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="form-group mb-2">
-                <label htmlFor="budgetLimit">Limit Amount (₦)</label>
-                <input
-                  type="number"
-                  id="budgetLimit"
-                  name="limit_amount"
-                  value={budgetForm.limit_amount}
-                  onChange={handleBudgetChange}
-                  required
-                  className="w-full p-2 border rounded"
-                  min="0"
-                />
-              </div>
-              {budgetError && <div className="text-red-600 mb-2">{budgetError}</div>}
-              <div className="flex gap-2 mt-4">
-                <button type="submit" className="btn" disabled={budgetLoading}>
-                  {budgetLoading ? 'Saving...' : 'Save Budget'}
-                </button>
-                <button type="button" className="btn btn-outline" onClick={() => setShowBudgetModal(false)}>
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-              </div>
-<BudgetSuggestions/>
+              <BudgetSuggestions/>
             </div>
             {/* Financial Charts */}
             <div className="finance-section fade-in">

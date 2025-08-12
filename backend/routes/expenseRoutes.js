@@ -5,7 +5,9 @@ const verifyToken = require('../middlewares/verifyToken');
 router.post('/', verifyToken, expenseController.addExpense);
 router.get('/', verifyToken, expenseController.getExpense);
 router.delete('/:id', verifyToken, expenseController.deleteExpense);
+
 router.get('/summary/monthly', verifyToken, expenseController.getMonthlyExpenses);
 router.get('/summary/weekly', verifyToken, expenseController.getWeeklyExpenses);
+router.get('/summary/savings-rate', verifyToken, expenseController.getMonthlySavingsRate);
 
 module.exports = router;

@@ -1,11 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "../css/Landing.css";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import HamburgerMenu from "./HamburgerMenu";
 // FontAwesome CDN for icons
 const fontAwesomeLink = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css";
 
 const LandingPage = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
     // Navbar scroll effect and back-to-top
     const handleScroll = () => {
@@ -23,14 +25,6 @@ const LandingPage = () => {
       }
     };
     window.addEventListener("scroll", handleScroll);
-    // Hamburger menu
-    const hamburger = document.getElementById("hamburger");
-    const navLinks = document.querySelector(".nav-links");
-    if (hamburger && navLinks) {
-      hamburger.addEventListener("click", () => {
-        navLinks.classList.toggle("active");
-      });
-    }
     // Back to top
     const backToTop = document.querySelector(".back-to-top");
     if (backToTop) {
@@ -57,7 +51,7 @@ const LandingPage = () => {
             <i className="fas fa-graduation-cap"></i>
             <span className="ske">Student</span><span className="mart">Assist</span>
           </a>
-          <ul className="nav-links">
+          <ul className={`nav-links${menuOpen ? " active" : ""}`}>
             <li><a href="/" className="nav-link">Home</a></li>
             <li><a href="/edtech" className="nav-link">Features</a></li>
             <li><a href="" className="nav-link">Pricing</a></li>
@@ -85,9 +79,9 @@ const LandingPage = () => {
             </motion.div>
           </div>
           </ul>
-          <button className="hamburger" id="hamburger">
-            <i className="fas fa-bars"></i>
-          </button>
+          <div className="md:hidden block">
+            <HamburgerMenu isOpen={menuOpen} setIsOpen={setMenuOpen} />
+          </div>
         </div>
       </nav>
 
@@ -206,25 +200,7 @@ const LandingPage = () => {
                 </div>
                 <p>"StudentAssist completely transformed how I manage my studies and finances. The reading planner helped me stay on track with my textbooks, and the finance tracker saved me from overspending!"</p>
                 <div className="mt-3">
-                  <i className  name="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>
-                  <i className="fas fa-star text-warning"></i>
-                  <i className="fas fa-star text-warning"></i>
-                  <i className="fas fa-star text-warning"></i>
-                </div>
-              </div>
-
-                            <div className="card">
-                <div className="d-flex align-items-center mb-3">
-                  <img src="https://randomuser.me/api/portraits/women/32.jpg" className="rounded-circle me-3" width="60" height="60" alt="Student" />
-                  <div>
-                    <h4 className="mb-0">Sarah Johnson</h4>
-                    <p className="text-muted mb-0">Computer Science Major</p>
-                  </div>
-                </div>
-                <p>"StudentAssist completely transformed how I manage my studies and finances. The reading planner helped me stay on track with my textbooks, and the finance tracker saved me from overspending!"</p>
-                <div className="mt-3">
-                  <i className  name="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>
@@ -242,7 +218,25 @@ const LandingPage = () => {
                 </div>
                 <p>"StudentAssist completely transformed how I manage my studies and finances. The reading planner helped me stay on track with my textbooks, and the finance tracker saved me from overspending!"</p>
                 <div className="mt-3">
-                  <i className  name="fas fa-star text-warning"></i>
+                  <i className="fas fa-star text-warning"></i>
+                  <i className="fas fa-star text-warning"></i>
+                  <i className="fas fa-star text-warning"></i>
+                  <i className="fas fa-star text-warning"></i>
+                  <i className="fas fa-star text-warning"></i>
+                </div>
+              </div>
+
+                            <div className="card">
+                <div className="d-flex align-items-center mb-3">
+                  <img src="https://randomuser.me/api/portraits/women/32.jpg" className="rounded-circle me-3" width="60" height="60" alt="Student" />
+                  <div>
+                    <h4 className="mb-0">Sarah Johnson</h4>
+                    <p className="text-muted mb-0">Computer Science Major</p>
+                  </div>
+                </div>
+                <p>"StudentAssist completely transformed how I manage my studies and finances. The reading planner helped me stay on track with my textbooks, and the finance tracker saved me from overspending!"</p>
+                <div className="mt-3">
+                  <i className="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>
                   <i className="fas fa-star text-warning"></i>

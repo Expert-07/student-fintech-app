@@ -1,3 +1,102 @@
+/* Mobile view styles for finance dashboard */
+@media (max-width: 600px) {
+  .finance-dashboard, .finance-container, .wallet-section, .budget-section, .summary-section, .analytics-section {
+    width: 100vw !important;
+    min-width: 0;
+    max-width: 100vw;
+    padding: 0 8px !important;
+    box-sizing: border-box;
+  }
+
+  .finance-dashboard {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1.2rem !important;
+  }
+
+  .wallet-section, .budget-section, .summary-section, .analytics-section {
+    margin-bottom: 1.2rem !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  .wallet-balance, .budget-amount, .summary-amount {
+    font-size: 1.3rem !important;
+  }
+
+  .top-up-btn, .add-expense-btn, .add-income-btn {
+    width: 100% !important;
+    margin: 0.5rem 0 0 0 !important;
+    font-size: 1rem !important;
+    padding: 12px 0 !important;
+  }
+
+  .chart-container, .analytics-section canvas {
+    width: 100% !important;
+    max-width: 100vw !important;
+    height: auto !important;
+  }
+
+  .finance-header, .section-title {
+    font-size: 1.2rem !important;
+    text-align: center !important;
+    margin-bottom: 0.8rem !important;
+  }
+
+  .finance-table, .finance-table th, .finance-table td {
+    font-size: 0.95rem !important;
+    padding: 6px 4px !important;
+  }
+
+  .finance-table th, .finance-table td {
+    white-space: normal !important;
+  }
+
+  .finance-table {
+    width: 100% !important;
+    overflow-x: auto !important;
+    display: block !important;
+  }
+
+  .modal-content {
+    width: 95vw !important;
+    min-width: 0 !important;
+    padding: 1.2rem 0.8rem !important;
+  }
+
+  .close-modal {
+    right: 10px !important;
+    top: 10px !important;
+  }
+
+  .finance-dashboard .row, .finance-dashboard .col {
+    flex-direction: column !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .finance-dashboard .col {
+    margin-bottom: 1rem !important;
+  }
+
+  .finance-dashboard .row {
+    gap: 0.8rem !important;
+  }
+
+  .finance-dashboard .btn, .finance-dashboard button {
+    width: 100% !important;
+    font-size: 1rem !important;
+    padding: 12px 0 !important;
+  }
+
+  .finance-dashboard .input, .finance-dashboard input, .finance-dashboard select {
+    width: 100% !important;
+    font-size: 1rem !important;
+    padding: 10px 8px !important;
+    margin-bottom: 0.7rem !important;
+  }
+}
 /* ===== GLOBAL STYLES ===== */
 :root {
     --primary: #00ffff;
