@@ -1,19 +1,27 @@
 const pool = require('../db');
 
 const getWallet = async (req, res) => {
-    const userId = req.user.id 
-
+    const userId = req.user.id;
     try {
-        const wallet = await pool.query('SELECT * FROM wallets WHERE user_id = $1', [userId]);
-        if (wallet.rows.length === 0) {
-            return res.status(400).json({message: 'Wallet not found '});
-        }
+        // Get total income
+        const incomeRes = await pool.query('SELECT COALESCE(SUM(amount),0) AS total_income FROM incomes WHERE user_id = $1', [userId]);
+        const totalIncome = parseFloat(incomeRes.rows[0].total_income);
 
-        res.status(200).json(wallet.rows[0]);
+        // Get total expenses
+        const expenseRes = await pool.query('SELECT COALESCE(SUM(amount),0) AS total_expenses FROM expenses WHERE user_id = $1', [userId]);
+        const totalExpenses = parseFloat(expenseRes.rows[0].total_expenses);
 
+        // Calculate total balance
+        const totalBalance = totalIncome - totalExpenses;
+
+        res.status(200).json({
+            totalBalance,
+            totalIncome,
+            totalExpenses
+        });
     } catch (error) {
-        console.error('Error fetching wallet: ', error);
-        res.status(500).json({message: 'Server error'})   
+        console.error('Error calculating wallet balance: ', error);
+        res.status(500).json({message: 'Server error'});
     }
 };
 

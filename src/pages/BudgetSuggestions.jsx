@@ -180,7 +180,7 @@ const BudgetSuggestions = () => {
                   <span>Spent: ₦{Number(spent).toLocaleString('en-NG', { minimumFractionDigits: 2 })}</span>
                   <span>Remaining: ₦{Number(remaining).toLocaleString('en-NG', { minimumFractionDigits: 2 })}</span>
                 </div>
-                <AnimatedProgressBar percent={percent} />
+                <AnimatedProgressBar percent={percent} key={`progress-bar-${idx}`} />
               </div>
               <div className={`budget-meta ${stateColor}`}>
                 <span>{stateIcon} {state}</span>

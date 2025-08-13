@@ -4,12 +4,12 @@ const db = require('../db');
 exports.searchStudents = async (req, res) => {
     const { name, department, year_of_study } = req.query;
     
-    let query = "SELECT id, full_name, profile_pic, department, year_of_study FROM students WHERE 1=1";
+    let query = "SELECT id, name, profile_pic, department, year_of_study FROM users WHERE 1=1";
     let values = [];
     let count = 1;
    
     if (name) {
-        query += ` AND LOWER(full_name) LIKE LOWER($${count++})`;
+        query += ` AND LOWER(name) LIKE LOWER($${count++})`;
         values.push(`%${name}%`);
     }
     if (department) {
@@ -24,10 +24,22 @@ exports.searchStudents = async (req, res) => {
     const result = await db.query(query, values);   
     res.json(result.rows);
 };
+//Send connection request
+exports.sendConnectionRequest = async (req, res) => {
+    const { receiver_id } = req.body;
+    const requester_id = req.user.id;
 
+    await db.query(
+        `INSERT INTO connections (requester_id, receiver_id, status) 
+         VALUES ($1, $2, 'pending') RETURNING *`,
+        [requester_id, receiver_id]
+    );
+    res.json({ message: 'Connection request sent successfully' });
+
+};
 exports.acceptController = async (req, res) => {
     const { request_id } = req.body;
-    await db.query('UPADATE connections SET status = $1 WHERE id = $2', ['accepted', request_id]);
+    await db.query('UPDATE connections SET status = $1 WHERE id = $2', ['accepted', request_id]);
     res.json({ message: 'Connection request accepted' });
 };
 
@@ -47,7 +59,7 @@ exports.getRelevantPosts = async (req, res) => {
     const { department, year_of_study } = userRes.rows[0];
 
     const result = await db.query(
-        `SELECT p.*, u.full_name, u.profile_pic FROM posts p JOIN users u ON p.user_id = u.id
+        `SELECT p.*, u.name, u.profile_pic FROM posts p JOIN users u ON p.user_id = u.id
         WHERE userId IN (
             SELECT CASE WHEN requester_id = $1 THEN receiver_id WHEN receiver_id = $1 THEN requester_id END 
             FROM connections WHERE (requester_id = $1 OR receiver_id = $1) AND status = 'accepted'
@@ -57,21 +69,3 @@ exports.getRelevantPosts = async (req, res) => {
     res.json(result.rows);  
 };
 
-exports.addIncome = async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const { amount, source, description } = req.body;
-        if (!amount || isNaN(amount) || amount <= 0) {
-            return res.status(400).json({ message: 'Amount is required and must be a positive number.' });
-        }
-        // Optionally, validate source/description
-        const result = await db.query(
-            'INSERT INTO incomes (user_id, amount, source, description, created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING *',
-            [userId, amount, source || null, description || null]
-        );
-        res.status(201).json({ message: 'Income added successfully', income: result.rows[0] });
-    } catch (err) {
-        console.error('Add income error:', err);
-        res.status(500).json({ message: 'Failed to add income' });
-    }
-};

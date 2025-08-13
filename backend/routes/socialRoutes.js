@@ -11,5 +11,7 @@ router.post('/accept', verifyToken, socialController.acceptController);
 router.post('/reject', verifyToken, socialController.rejectController);
 // Route to get relevant posts based on user connections and department/year of study
 router.get('/posts/relevant', verifyToken, socialController.getRelevantPosts);
+//connect
+router.get('/connect', verifyToken, socialController.sendConnectionRequest);
 
 module.exports = router;

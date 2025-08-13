@@ -1,13 +1,116 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../css/reading.css";
 import SideBar from "./SideBar";
 // NOTE: Make sure to import the CSS from reading (all in one).html in your main index.html or as a separate CSS file for pixel-perfect styling.
 
-export default function ReadingPlannerTemplate() {
+export default function ReadingPlanner() {
+  // State for reading plans and form
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [form, setForm] = useState({
+    book_title: "",
+    author: "",
+    subject: "",
+    total_pages: "",
+    current_page: "",
+    start_date: "",
+    end_date: "",
+    pages_per_day: "",
+    notes: "",
+  });
+  const [adding, setAdding] = useState(false);
+
+  // Fetch reading plans
+  useEffect(() => {
+    fetchPlans();
+  }, []);
+
+  const fetchPlans = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:5000/api/readingplanner", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) setPlans(data.plans);
+      else setError(data.message || "Failed to fetch plans");
+    } catch (err) {
+      setError("Failed to fetch plans");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle form input
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // Add new reading plan
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    setAdding(true);
+    setError("");
+    // Validate required fields
+    if (!form.book_title || !form.total_pages || !form.pages_per_day || !form.start_date || !form.end_date) {
+      setError("Please fill in all required fields.");
+      setAdding(false);
+      return;
+    }
+    try {
+      const token = localStorage.getItem("token");
+      // Only send fields the backend expects
+      const payload = {
+        book_title: form.book_title,
+        total_pages: Number(form.total_pages),
+        pages_per_day: Number(form.pages_per_day),
+        start_date: form.start_date,
+        end_date: form.end_date,
+      };
+      const res = await fetch("http://localhost:5000/api/readingplanner", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPlans([data.plan, ...plans]);
+        setForm({ book_title: "", author: "", subject: "", total_pages: "", current_page: "", start_date: "", end_date: "", pages_per_day: "", notes: "" });
+      } else {
+        setError(data.message || "Failed to add plan");
+      }
+    } catch (err) {
+      setError("Failed to add plan");
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  // Delete a plan
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this reading plan?")) return;
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:5000/api/readingplanner/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) setPlans(plans.filter((p) => p.id !== id));
+      else setError("Failed to delete plan");
+    } catch {
+      setError("Failed to delete plan");
+    }
+  };
+
   return (
     <div className="dashboard-layout">
       {/* Sidebar Navigation */}
-<SideBar/>
+      <SideBar />
       {/* Main Content Area */}
       <main className="main-content">
         {/* Dashboard Header */}
@@ -38,18 +141,18 @@ export default function ReadingPlannerTemplate() {
             <div className="section-title">
               <h2><i className="fas fa-plus-circle"></i> Add New Book</h2>
             </div>
-            <form className="add-book-form">
+            <form className="add-book-form" onSubmit={handleAdd}>
               <div className="form-group">
                 <label htmlFor="bookTitle">Book Title</label>
-                <input type="text" id="bookTitle" placeholder="Enter book title" />
+                <input type="text" id="bookTitle" name="book_title" value={form.book_title} onChange={handleChange} placeholder="Enter book title" required />
               </div>
               <div className="form-group">
-                <label htmlFor="bookAuthor">Author</label>
-                <input type="text" id="bookAuthor" placeholder="Enter author name" />
+                <label htmlFor="author">Author</label>
+                <input type="text" id="author" name="author" value={form.author} onChange={handleChange} placeholder="Enter author name" />
               </div>
               <div className="form-group">
-                <label htmlFor="bookSubject">Subject/Category</label>
-                <select id="bookSubject">
+                <label htmlFor="subject">Subject/Category</label>
+                <select id="subject" name="subject" value={form.subject} onChange={handleChange}>
                   <option value="">Select subject</option>
                   <option value="cs">Computer Science</option>
                   <option value="math">Mathematics</option>
@@ -61,27 +164,32 @@ export default function ReadingPlannerTemplate() {
               </div>
               <div className="form-group">
                 <label htmlFor="totalPages">Total Pages</label>
-                <input type="number" id="totalPages" placeholder="Enter total pages" />
+                <input type="number" id="totalPages" name="total_pages" value={form.total_pages} onChange={handleChange} placeholder="Enter total pages" required />
               </div>
               <div className="form-group">
                 <label htmlFor="currentPage">Current Page</label>
-                <input type="number" id="currentPage" placeholder="Enter current page" />
+                <input type="number" id="currentPage" name="current_page" value={form.current_page} onChange={handleChange} placeholder="Enter current page" />
               </div>
               <div className="form-group">
-                <label htmlFor="targetDate">Target Completion Date</label>
-                <input type="text" id="targetDate" className="date-picker" placeholder="Select target date" />
+                <label htmlFor="startDate">Start Date</label>
+                <input type="date" id="startDate" name="start_date" value={form.start_date} onChange={handleChange} required />
+              </div>
+              <div className="form-group">
+                <label htmlFor="endDate">Target Completion Date</label>
+                <input type="date" id="endDate" name="end_date" value={form.end_date} onChange={handleChange} required />
               </div>
               <div className="form-group">
                 <label htmlFor="dailyTarget">Daily Target (pages)</label>
-                <input type="number" id="dailyTarget" placeholder="Enter daily target" />
+                <input type="number" id="dailyTarget" name="pages_per_day" value={form.pages_per_day} onChange={handleChange} placeholder="Enter daily target" required />
               </div>
               <div className="form-group">
                 <label htmlFor="bookNotes">Notes</label>
-                <textarea id="bookNotes" rows="2" placeholder="Add notes about this book"></textarea>
+                <textarea id="bookNotes" name="notes" value={form.notes} onChange={handleChange} rows="2" placeholder="Add notes about this book"></textarea>
               </div>
-              <button type="button" className="btn btn-full">
-                <i className="fas fa-book-medical"></i> Add Book to Reading List
+              <button type="submit" className="btn btn-full" disabled={adding}>
+                <i className="fas fa-book-medical"></i> {adding ? "Adding..." : "Add Book to Reading List"}
               </button>
+              {error && <div style={{ color: 'red', marginTop: 8 }}>{error}</div>}
             </form>
           </div>
           {/* Reading List */}
@@ -97,100 +205,48 @@ export default function ReadingPlannerTemplate() {
                 </select>
               </div>
             </div>
-            <ul className="book-list">
-              <li className="book-item fade-in">
-                <div className="book-cover">
-                  <i className="fas fa-microchip"></i>
-                </div>
-                <div className="book-details">
-                  <h3 className="book-title">Computer Science Principles</h3>
-                  <div className="book-author">David Reed</div>
-                  <div className="book-meta">
-                    <span><i className="fas fa-layer-group"></i> Pages: 480</span>
-                    <span><i className="fas fa-tag"></i> Computer Science</span>
-                    <span><i className="fas fa-calendar"></i> Due: Aug 15, 2023</span>
-                  </div>
-                  <div className="progress-container">
-                    <div className="progress-info">
-                      <span>Progress: 78%</span>
-                      <span>Page 375/480</span>
-                    </div>
-                    <div className="progress-bar">
-                      <div className="progress-fill" style={{ width: "78%" }}></div>
-                    </div>
-                  </div>
-                  <div className="book-actions">
-                    <button className="action-btn"><i className="fas fa-edit"></i> Update</button>
-                    <button className="action-btn"><i className="fas fa-calendar"></i> Schedule</button>
-                    <button className="action-btn"><i className="fas fa-tasks"></i> Goals</button>
-                    <button className="action-btn"><i className="fas fa-trash-alt"></i> Remove</button>
-                  </div>
-                </div>
-              </li>
-              <li className="book-item fade-in">
-                <div className="book-cover">
-                  <i className="fas fa-calculator"></i>
-                </div>
-                <div className="book-details">
-                  <h3 className="book-title">Advanced Calculus</h3>
-                  <div className="book-author">Michael Spivak</div>
-                  <div className="book-meta">
-                    <span><i className="fas fa-layer-group"></i> Pages: 670</span>
-                    <span><i className="fas fa-tag"></i> Mathematics</span>
-                    <span><i className="fas fa-calendar"></i> Due: Sep 10, 2023</span>
-                  </div>
-                  <div className="progress-container">
-                    <div className="progress-info">
-                      <span>Progress: 35%</span>
-                      <span>Page 234/670</span>
-                    </div>
-                    <div className="progress-bar">
-                      <div className="progress-fill" style={{ width: "35%" }}></div>
-                    </div>
-                  </div>
-                  <div className="book-actions">
-                    <button className="action-btn"><i className="fas fa-edit"></i> Update</button>
-                    <button className="action-btn"><i className="fas fa-calendar"></i> Schedule</button>
-                    <button className="action-btn"><i className="fas fa-tasks"></i> Goals</button>
-                    <button className="action-btn"><i className="fas fa-trash-alt"></i> Remove</button>
-                  </div>
-                </div>
-              </li>
-              <li className="book-item fade-in">
-                <div className="book-cover">
-                  <i className="fas fa-atom"></i>
-                </div>
-                <div className="book-details">
-                  <h3 className="book-title">Modern Physics</h3>
-                  <div className="book-author">Kenneth Krane</div>
-                  <div className="book-meta">
-                    <span><i className="fas fa-layer-group"></i> Pages: 720</span>
-                    <span><i className="fas fa-tag"></i> Physics</span>
-                    <span><i className="fas fa-calendar"></i> Due: Dec 5, 2023</span>
-                  </div>
-                  <div className="progress-container">
-                    <div className="progress-info">
-                      <span>Progress: 15%</span>
-                      <span>Page 108/720</span>
-                    </div>
-                    <div className="progress-bar">
-                      <div className="progress-fill" style={{ width: "15%" }}></div>
-                    </div>
-                  </div>
-                  <div className="book-actions">
-                    <button className="action-btn"><i className="fas fa-edit"></i> Update</button>
-                    <button className="action-btn"><i className="fas fa-calendar"></i> Schedule</button>
-                    <button className="action-btn"><i className="fas fa-tasks"></i> Goals</button>
-                    <button className="action-btn"><i className="fas fa-trash-alt"></i> Remove</button>
-                  </div>
-                </div>
-              </li>
-            </ul>
-            <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
-              <button className="btn btn-outline">
-                <i className="fas fa-plus"></i> Load More Books
-              </button>
-            </div>
+            {loading ? (
+              <div>Loading...</div>
+            ) : plans.length === 0 ? (
+              <div>No reading plans yet.</div>
+            ) : (
+              <ul className="book-list">
+                {plans.map((plan) => {
+                  const progress = plan.total_pages ? Math.round((plan.current_page || 0) / plan.total_pages * 100) : 0;
+                  return (
+                    <li className="book-item fade-in" key={plan.id}>
+                      <div className="book-cover">
+                        <i className="fas fa-book"></i>
+                      </div>
+                      <div className="book-details">
+                        <h3 className="book-title">{plan.book_title}</h3>
+                        <div className="book-meta">
+                          <span><i className="fas fa-layer-group"></i> Pages: {plan.total_pages}</span>
+                          <span><i className="fas fa-calendar"></i> Due: {plan.end_date}</span>
+                        </div>
+                        <div className="progress-container">
+                          <div className="progress-info">
+                            <span>Progress: {progress}%</span>
+                            <span>Page {plan.current_page || 0}/{plan.total_pages}</span>
+                          </div>
+                          <div className="progress-bar">
+                            <div className="progress-fill" style={{ width: `${progress}%` }}></div>
+                          </div>
+                        </div>
+                        <div className="book-actions">
+                          {/* Add update progress and delete handlers here */}
+                          <button className="action-btn" onClick={() => {
+                            const newPage = prompt("Enter current page:", plan.current_page || 0);
+                            if (newPage !== null && !isNaN(newPage)) updateProgress(plan.id, Number(newPage));
+                          }}><i className="fas fa-edit"></i> Update</button>
+                          <button className="action-btn" onClick={() => handleDelete(plan.id)}><i className="fas fa-trash-alt"></i> Remove</button>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
           {/* Reading Calendar */}
           <div className="planner-section fade-in">
@@ -342,4 +398,22 @@ export default function ReadingPlannerTemplate() {
       </main>
     </div>
   );
+
+  // Update progress handler
+  async function updateProgress(planId, current_page) {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:5000/api/readingplanner/${planId}/progress`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ current_page }),
+      });
+      if (res.ok) {
+        setPlans((prev) => prev.map((p) => (p.id === planId ? { ...p, current_page } : p)));
+      }
+    } catch {}
+  }
 }

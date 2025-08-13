@@ -23,98 +23,39 @@ import ReminderSystem from "./SmartReminders";
 
 //const userAvatar = "https://ui-avatars.com/api/?name=Alex+Johnson&background=00ffff&color=121212";
 
+function NotificationBanner({ message, onClose }) {
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      background: '#2563eb',
+      color: 'white',
+      padding: '10px',
+      textAlign: 'center',
+      zIndex: 1000,
+    }}>
+      {message}
+      <button
+        onClick={onClose}
+        style={{
+          marginLeft: '20px',
+          background: 'transparent',
+          border: 'none',
+          color: 'white',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+        }}
+      >
+        ✕
+      </button>
+    </div>
+  );
+}
+
 export default function DashboardTemplate() {
   // Example state for dynamic data (replace with backend fetch logic)
-  /*const [user, setUser] = useState({ name: "Alex" });
-  const [remindersCount, setRemindersCount] = useState(3);
-  const [stats, setStats] = useState({
-    reading: 78,
-    savings: 1250,
-    streak: 14,
-    achievements: 18,
-  });
-
-  useEffect(() => {
-    // Chart.js initialization (replace with real data as needed)
-    const progressCtx = document.getElementById("progressChart");
-    const savingsCtx = document.getElementById("savingsChart");
-    if (progressCtx) {
-      new Chart(progressCtx, {
-        type: "bar",
-        data: {
-          labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-          datasets: [
-            {
-              label: "Reading Progress",
-              data: [30, 45, 60, 20, 50, 10, 40],
-              backgroundColor: "#00ffff",
-              borderRadius: 5,
-            },
-            {
-              label: "Savings",
-              data: [10, 20, 15, 25, 20, 5, 15],
-              backgroundColor: "#ffcc00",
-              borderRadius: 5,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { position: "top" } },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                callback: function (value) {
-                  return value + (this.scale.id === "y" ? "%" : "$ ");
-                },
-              },
-            },
-          },
-        },
-      });
-    }
-    if (savingsCtx) {
-      new Chart(savingsCtx, {
-        type: "doughnut",
-        data: {
-          labels: ["New Laptop", "Emergency Fund", "Entertainment", "Tuition", "Other"],
-          datasets: [
-            {
-              data: [325, 200, 120, 300, 150],
-              backgroundColor: ["#00ffff", "#00ccff", "#ffcc00", "#ff3366", "#00ff99"],
-              borderWidth: 0,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { position: "right" } },
-          cutout: "65%",
-        },
-      });
-    }
-  }, []);
-
-  // Sidebar toggle (mobile)
-  useEffect(() => {
-    const menuToggle = document.getElementById("menuToggle");
-    const sidebar = document.getElementById("sidebar");
-    if (menuToggle && sidebar) {
-      menuToggle.addEventListener("click", () => {
-        sidebar.classList.toggle("active");
-      });
-    }
-    const searchToggle = document.getElementById("searchToggle");
-    const searchBar = document.getElementById("searchBar");
-    if (searchToggle && searchBar) {
-      searchToggle.addEventListener("click", () => {
-        searchBar.classList.toggle("active");
-      });
-    }
-  }, []);
-*/
-
 
   const [wallet, setWallet] = useState(null);
   const [topupAmount, setTopupAmount] = useState("");
@@ -122,12 +63,9 @@ export default function DashboardTemplate() {
   const [user, setUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [remindersCount, setRemindersCount] = useState(0);
- const [stats, setStats] = useState({
-    reading: 78,
-    savings: 1250,
-    streak: 14,
-    achievements: 18,
-  });
+  const [readingProgress, setReadingProgress] = useState({ percent: 0, completed: 0, total: 0 });
+  const [streak, setStreak] = useState(0);
+  const [notification, setNotification] = useState(null);
   const { summary, loading: loadingWeekly } = useWeeklySummary();
   console.log("Weekly summary:", summary);
   // Get token and decode user ID
@@ -139,7 +77,35 @@ export default function DashboardTemplate() {
     setUserId(decoded.id);
     setUser(decoded);
     fetchWallet(token);
+    fetchReadingProgress(token);
+    fetchStreak(token);
   }, []);
+
+  // Fetch reading progress from backend
+  const fetchReadingProgress = async (token) => {
+    try {
+      const res = await fetch("http://localhost:5000/api/readingplanner", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.plans)) {
+        const total = data.plans.length;
+        const completed = data.plans.filter(p => Number(p.current_page) >= Number(p.total_pages) && p.total_pages > 0).length;
+        // Average percent progress across all plans
+        let percent = 0;
+        if (total > 0) {
+          percent = Math.round(
+            data.plans.reduce((sum, p) => sum + ((p.current_page || 0) / (p.total_pages || 1)), 0) / total * 100
+          );
+        }
+        setReadingProgress({ percent, completed, total });
+      } else {
+        setReadingProgress({ percent: 0, completed: 0, total: 0 });
+      }
+    } catch {
+      setReadingProgress({ percent: 0, completed: 0, total: 0 });
+    }
+  };
 
   // Fetch Wallet
   const fetchWallet = async (token) => {
@@ -162,6 +128,23 @@ export default function DashboardTemplate() {
     }
   };
 
+  // Fetch streak from backend
+  const fetchStreak = async (token) => {
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/streak", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setStreak(data.streak);
+      } else {
+        console.error("Error fetching streak:", data.message);
+      }
+    } catch (err) {
+      console.error("Fetch streak failed:", err);
+    }
+  };
+
   // Handle Top-Up
   const handleTopup = async () => {
     const token = localStorage.getItem("token");
@@ -180,15 +163,15 @@ export default function DashboardTemplate() {
       const data = await res.json();
 
       if (res.ok) {
-        alert("Wallet topped up successfully!");
+        setNotification("Wallet topped up successfully!");
         setTopupAmount("");
         fetchWallet(token); // 🔁 Refresh wallet
       } else {
-        alert(data.message || "Top-up failed");
+        setNotification(data.message || "Top-up failed");
       }
     } catch (err) {
       console.error("Top-up failed:", err);
-      alert("Top-up error");
+      setNotification("Top-up error");
     }
   };
   // Sidebar toggle (mobile)
@@ -231,12 +214,28 @@ export default function DashboardTemplate() {
     fetchRemindersCount();
   }, []);
 
+  useEffect(() => {
+    // Example: Trigger a notification after 5 seconds
+    const timer = setTimeout(() => {
+      setNotification("Welcome back! Check out your new goals.");
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="dashboard-layout">
       {/* Sidebar Navigation */}
 <SideBar/>
       {/* Main Content Area */}
       <main className="main-content">
+        {/* Notification Banner */}
+        {notification && (
+          <NotificationBanner
+            message={notification}
+            onClose={() => setNotification(null)}
+          />
+        )}
         {/* Dashboard Header */}
         <header className="dashboard-header">
           <button className="menu-toggle" id="menuToggle">
@@ -272,9 +271,13 @@ export default function DashboardTemplate() {
               <div className="stat-icon">
                 <i className="fas fa-book-open"></i>
               </div>
-              <div className="stat-title">Reading Progress</div>
-              <div className="stat-value">{stats.reading}%</div>
-              <div className="stat-subtext">5/7 chapters completed</div>
+            <div className="stat-title">Reading Progress</div>
+              <div className="stat-value">{readingProgress.percent}%</div>
+              <div className="stat-subtext">
+                {readingProgress.total > 0
+                  ? `${readingProgress.completed}/${readingProgress.total} books completed`
+                  : "No books tracked yet"}
+              </div>
             </div>
             <div className="stat-card fade-in">
               <div className="stat-icon">
@@ -283,7 +286,7 @@ export default function DashboardTemplate() {
               <div className="stat-title">Total Savings</div>
               <div className="stat-value">
                 {wallet
-                  ? `₦${Number(wallet.balance).toLocaleString('en-NG', {
+                  ? `₦${Number(wallet.totalBalance).toLocaleString('en-NG', {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}`
@@ -304,7 +307,7 @@ export default function DashboardTemplate() {
                 <i className="fas fa-fire"></i>
               </div>
               <div className="stat-title">Day Streak</div>
-              <div className="stat-value">{stats.streak}</div>
+              <div className="stat-value">{streak}</div>
               <div className="stat-subtext">Keep going!</div>
             </div>
             <div className="stat-card fade-in">
@@ -312,7 +315,7 @@ export default function DashboardTemplate() {
                 <i className="fas fa-trophy"></i>
               </div>
               <div className="stat-title">Achievements</div>
-              <div className="stat-value">{stats.achievements}</div>
+              <div className="stat-value">{}</div>
               <div className="stat-subtext">Master Reader unlocked</div>
             </div>
 

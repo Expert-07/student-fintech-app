@@ -1,0 +1,1088 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudentAssist - Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        :root {
+            --primary: #00ffff;
+            --primary-light: #00e6e6;
+            --secondary: #0000ff;
+            --accent: #00ccff;
+            --success: #00ff99;
+            --warning: #ffcc00;
+            --danger: #ff3366;
+            --dark-bg: #121212;
+            --card-bg: #1a1a1a;
+            --text-color: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ===== DASHBOARD LAYOUT ===== */
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 250px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--primary);
+            padding: 1.5rem 0;
+            position: fixed;
+            height: 100%;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .logo {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid #2d2d2d;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .sidebar .logo .ske {
+            color: #ffffff;
+            font-weight: 800;
+        }
+
+        .sidebar .logo .mart {
+            color: var(--primary);
+        }
+
+        .dashboard-nav ul {
+            list-style: none;
+        }
+
+        .dashboard-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-nav a {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-nav a:hover, .dashboard-nav a.active {
+            background: rgba(0, 255, 255, 0.1);
+            border-left: 4px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .dashboard-nav i {
+            width: 30px;
+            font-size: 1.2rem;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 250px;
+            z-index: 90;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 1px solid #2d2d2d;
+            transition: all 0.3s ease;
+        }
+
+        .search-profile {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .search-bar {
+            position: relative;
+        }
+
+        .search-bar input {
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border-radius: 20px;
+            background: var(--dark-bg);
+            border: 1px solid #2d2d2d;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            width: 250px;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            outline: none;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+        }
+
+        .profile-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .profile-dropdown:hover {
+            color: var(--primary);
+        }
+
+        .profile-dropdown img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--primary);
+            padding: 2px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* ===== DASHBOARD CONTENT ===== */
+        .dashboard-content {
+            padding-top: 80px;
+        }
+
+        /* ===== PROFILE PAGE SPECIFIC STYLES ===== */
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .profile-avatar {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        
+        .profile-avatar img {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 4px;
+        }
+        
+        .level-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--warning), #ff9900);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #121212;
+            border: 3px solid var(--dark-bg);
+        }
+        
+        .profile-header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .profile-header p {
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .profile-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            background: var(--primary);
+            color: var(--dark-bg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 255, 255, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: rgba(0, 255, 255, 0.1);
+        }
+        
+        /* Profile Sections */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 992px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .profile-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #2d2d2d;
+        }
+        
+        .section-title h2 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Achievements */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .achievement-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            border-color: var(--primary);
+        }
+        
+        .achievement-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--warning);
+        }
+        
+        .achievement-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .achievement-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--primary);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+            padding-left: 20px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            z-index: 1;
+        }
+        
+        .timeline-date {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .timeline-content {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .timeline-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .timeline-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Skills */
+        .skill-item {
+            margin-bottom: 1.5rem;
+        }
+        
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .skill-name {
+            font-weight: 500;
+        }
+        
+        .skill-percent {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            border-radius: 5px;
+            background: #2d2d2d;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 5px;
+        }
+        
+        .chart-container {
+            height: 250px;
+            margin-top: 2rem;
+        }
+        
+        /* Goals */
+        .goal-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+        
+        .goal-title {
+            font-weight: 600;
+        }
+        
+        .goal-percent {
+            background: var(--primary);
+            color: var(--dark-bg);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .progress-container {
+            margin: 0.5rem 0;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .sidebar .logo span, 
+            .dashboard-nav span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .dashboard-header {
+                left: 70px;
+            }
+            
+            .search-bar input {
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 1000;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .dashboard-header {
+                left: 0;
+                justify-content: space-between;
+                padding: 1rem;
+            }
+            
+            .menu-toggle {
+                display: block;
+                background: none;
+                border: none;
+                color: var(--primary);
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+            
+            .search-bar {
+                display: none;
+            }
+            
+            .search-bar.active {
+                display: block;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                padding: 0.5rem 1rem;
+                background: var(--card-bg);
+                z-index: 90;
+            }
+            
+            .search-bar.active input {
+                width: 100%;
+            }
+            
+            .search-toggle {
+                display: block;
+                background: none;
+                border: none;
+                color: var(--primary);
+                font-size: 1.2rem;
+                cursor: pointer;
+            }
+            
+            .achievements-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .profile-actions {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .profile-avatar img {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .level-badge {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Dashboard Layout -->
+    <div class="dashboard-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span class="ske">Student</span><span class="mart">Assist</span>
+            </div>
+            
+            <nav class="dashboard-nav">
+                <ul>
+                    <li>
+                        <a href="dashboard.html">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="reading.html">
+                            <i class="fas fa-book-open"></i>
+                            <span>Reading Planner</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="finance.html">
+                            <i class="fas fa-wallet"></i>
+                            <span>Finance Tracker</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Progress Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="active">
+                            <i class="fas fa-user"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="settings.html">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard Header -->
+            <header class="dashboard-header">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="search-bar" id="searchBar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search...">
+                </div>
+                
+                <div class="search-profile">
+                    <button class="search-toggle" id="searchToggle">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    
+                    <div class="profile-dropdown">
+                        <div class="notification-badge">3</div>
+                        <img src="https://ui-avatars.com/api/?name=Alex+Johnson&background=00ffff&color=121212" alt="Alex">
+                        <span>Satoru Gojo</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Profile Content -->
+            <div class="dashboard-content">
+                <div class="profile-header fade-in">
+                    <div class="profile-avatar">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile">
+                        <div class="level-badge">24</div>
+                    </div>
+                    <h1>Satoru Gojo</h1>
+                    <p>Computer Science Student | Goal-Oriented Learner | Member since 2023</p>
+                    <div class="profile-actions">
+                        <button class="btn">
+                            <i class="fas fa-cog"></i> Edit Profile
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-share-alt"></i> Share Profile
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-trophy"></i> View Achievements
+                        </button>
+                    </div>
+                </div>
+
+                <div class="profile-grid">
+                    <!-- Left Column -->
+                    <div>
+                        <!-- Achievements Section -->
+                        <div class="profile-section fade-in">
+                            <div class="section-title">
+                                <h2><i class="fas fa-trophy"></i> Achievements</h2>
+                            </div>
+                            
+                            <div class="achievements-grid">
+                                <div class="achievement-card">
+                                    <div class="achievement-icon">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <h3>Master Reader</h3>
+                                    <p>Completed 5 books in one semester</p>
+                                </div>
+                                
+                                <div class="achievement-card">
+                                    <div class="achievement-icon">
+                                        <i class="fas fa-fire"></i>
+                                    </div>
+                                    <h3>30-Day Streak</h3>
+                                    <p>Consistent daily reading for 30 days</p>
+                                </div>
+                                
+                                <div class="achievement-card">
+                                    <div class="achievement-icon">
+                                        <i class="fas fa-piggy-bank"></i>
+                                    </div>
+                                    <h3>Savings Expert</h3>
+                                    <p>Saved $1000 in 6 months</p>
+                                </div>
+                                
+                                <div class="achievement-card">
+                                    <div class="achievement-icon">
+                                        <i class="fas fa-rocket"></i>
+                                    </div>
+                                    <h3>Fast Learner</h3>
+                                    <p>Completed 3 goals ahead of schedule</p>
+                                </div>
+                                
+                                <div class="achievement-card">
+                                    <div class="achievement-icon">
+                                        <i class="fas fa-medal"></i>
+                                    </div>
+                                    <h3>Chapter Champion</h3>
+                                    <p>Completed 50 chapters in one month</p>
+                                </div>
+                                
+                                <div class="achievement-card">
+                                    <div class="achievement-icon">
+                                        <i class="fas fa-balance-scale"></i>
+                                    </div>
+                                    <h3>Budget Master</h3>
+                                    <p>Stayed within budget for 3 months</p>
+                                </div>
+                            </div>
+                            
+                            <div style="text-align: center; margin-top: 1.5rem;">
+                                <button class="btn btn-outline">
+                                    <i class="fas fa-award"></i> View All Achievements
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Timeline Section -->
+                        <div class="profile-section fade-in">
+                            <div class="section-title">
+                                <h2><i class="fas fa-history"></i> Progress Timeline</h2>
+                            </div>
+                            
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-date">July 18, 2023</div>
+                                    <div class="timeline-content">
+                                        <h3>Reached Level 24</h3>
+                                        <p>Unlocked the Master Reader achievement</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item">
+                                    <div class="timeline-date">July 15, 2023</div>
+                                    <div class="timeline-content">
+                                        <h3>Completed Database Chapter</h3>
+                                        <p>Finished Chapter 5 of Computer Science textbook</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item">
+                                    <div class="timeline-date">July 10, 2023</div>
+                                    <div class="timeline-content">
+                                        <h3>Financial Milestone</h3>
+                                        <p>Saved $1000 total across all goals</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item">
+                                    <div class="timeline-date">June 28, 2023</div>
+                                    <div class="timeline-content">
+                                        <h3>30-Day Reading Streak</h3>
+                                        <p>Consistent reading for a full month</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item">
+                                    <div class="timeline-date">June 1, 2023</div>
+                                    <div class="timeline-content">
+                                        <h3>Joined StudentAssist</h3>
+                                        <p>Started academic and financial journey</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column -->
+                    <div>
+                        <!-- Skills Section -->
+                        <div class="profile-section fade-in">
+                            <div class="section-title">
+                                <h2><i class="fas fa-star"></i> Skills</h2>
+                            </div>
+                            
+                            <div class="skill-item">
+                                <div class="skill-header">
+                                    <span class="skill-name">Discipline</span>
+                                    <span class="skill-percent">84%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 84%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="skill-item">
+                                <div class="skill-header">
+                                    <span class="skill-name">Financial Literacy</span>
+                                    <span class="skill-percent">76%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 76%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="skill-item">
+                                <div class="skill-header">
+                                    <span class="skill-name">Knowledge Retention</span>
+                                    <span class="skill-percent">92%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 92%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="skill-item">
+                                <div class="skill-header">
+                                    <span class="skill-name">Consistency</span>
+                                    <span class="skill-percent">88%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 88%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="skill-item">
+                                <div class="skill-header">
+                                    <span class="skill-name">Goal Setting</span>
+                                    <span class="skill-percent">79%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 79%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-container">
+                                <canvas id="skillsChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Current Goals Section -->
+                        <div class="profile-section fade-in">
+                            <div class="section-title">
+                                <h2><i class="fas fa-bullseye"></i> Current Goals</h2>
+                            </div>
+                            
+                            <div class="goal-card">
+                                <div class="goal-header">
+                                    <div class="goal-title">Complete CS Textbook</div>
+                                    <div class="goal-percent">78%</div>
+                                </div>
+                                <div class="progress-container">
+                                    <div class="progress-info">
+                                        <span>Chapters: 5/7</span>
+                                        <span>3 days left</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 78%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="goal-card">
+                                <div class="goal-header">
+                                    <div class="goal-title">New Laptop Fund</div>
+                                    <div class="goal-percent">65%</div>
+                                </div>
+                                <div class="progress-container">
+                                    <div class="progress-info">
+                                        <span>$325/$500</span>
+                                        <span>3 weeks left</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 65%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="goal-card">
+                                <div class="goal-header">
+                                    <div class="goal-title">Research Paper Draft</div>
+                                    <div class="goal-percent">40%</div>
+                                </div>
+                                <div class="progress-container">
+                                    <div class="progress-info">
+                                        <span>Sections: 2/5</span>
+                                        <span>2 weeks left</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 40%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="goal-card">
+                                <div class="goal-header">
+                                    <div class="goal-title">Fitness Challenge</div>
+                                    <div class="goal-percent">60%</div>
+                                </div>
+                                <div class="progress-container">
+                                    <div class="progress-info">
+                                        <span>Sessions: 12/20</span>
+                                        <span>10 days left</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+            });
+            
+            // Search toggle
+            const searchToggle = document.getElementById('searchToggle');
+            const searchBar = document.getElementById('searchBar');
+            
+            searchToggle.addEventListener('click', function() {
+                searchBar.classList.toggle('active');
+            });
+            
+            // Initialize skills radar chart
+            const skillsCtx = document.getElementById('skillsChart').getContext('2d');
+            const skillsChart = new Chart(skillsCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Discipline', 'Knowledge', 'Consistency', 'Finance', 'Planning', 'Retention'],
+                    datasets: [{
+                        label: 'Skill Level',
+                        data: [84, 92, 88, 76, 79, 92],
+                        backgroundColor: 'rgba(0, 255, 255, 0.2)',
+                        borderColor: 'rgba(0, 255, 255, 1)',
+                        pointBackgroundColor: 'rgba(0, 255, 255, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(0, 255, 255, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            pointLabels: {
+                                color: '#e0e0e0',
+                                font: {
+                                    size: 11
+                                }
+                            },
+                            ticks: {
+                                backdropColor: 'transparent',
+                                color: 'rgba(255, 255, 255, 0.5)',
+                                stepSize: 20
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Add fade-in animations to elements as they enter viewport
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.fade-in').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -47,6 +47,18 @@ export default function CampusMap() {
       <div className="mt-6 text-center text-gray-500 dark:text-gray-300">
         Click on markers for building info. You can add more locations in the code.
       </div>
+      <div className="campus-map-container" style={{ padding: '20px', textAlign: 'center' }}>
+        <h1>Campus Map - Rivers State University</h1>
+        <iframe
+          title="Rivers State University Map"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=6.980317314763%2C4.787123456789%2C6.984317314763%2C4.791123456789&layer=mapnik&marker=4.789123456789%2C6.982317314763"
+          width="100%"
+          height="500"
+          style={{ border: 0 }}
+          allowFullScreen=""
+          loading="lazy"
+        ></iframe>
+      </div>
     </div>
   );
 }

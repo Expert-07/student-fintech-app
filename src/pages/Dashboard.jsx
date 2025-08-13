@@ -14,7 +14,6 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 import { BsBook } from "react-icons/bs";
 import ReminderSystem from "./SmartReminders";
 import BottomNav from "./BottomNav";
-import SideBar from "./SideBar";
 
 
 
@@ -25,6 +24,7 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [remindersCount, setRemindersCount] = useState(0);
+  const [notification, setNotification] = useState(""); // For notifications
 
   // Get token and decode user ID
   useEffect(() => {
@@ -76,15 +76,15 @@ export default function Dashboard() {
       const data = await res.json();
 
       if (res.ok) {
-        alert("Wallet topped up successfully!");
+        setNotification("Wallet topped up successfully!");
         setTopupAmount("");
         fetchWallet(token); // 🔁 Refresh wallet
       } else {
-        alert(data.message || "Top-up failed");
+        setNotification(data.message || "Top-up failed");
       }
     } catch (err) {
       console.error("Top-up failed:", err);
-      alert("Top-up error");
+      setNotification("Top-up error");
     }
   };
 
@@ -127,7 +127,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-3 gap-3 mb-4">
         
         <div className="border rounded-xl p-4 col-span-2 dark:bg-[#1E293B] border-[#334155]">
-          <p className="text-gray-500 dark:text-[#F8FAFC]">Total Savings</p>
+          <p className="text-gray-500 dark:text-[#F8FAFC]">Current Balance</p>
           <p className="text-2xl font-bold">₦{Number(wallet.balance).toLocaleString('en-NG', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
@@ -150,9 +150,8 @@ export default function Dashboard() {
           
         </div>
         <div className="border rounded-xl p-4 flex justify-center items-center dark:bg-[#1E293B] border-[#334155]">
-          <button onClick={() => setShowModal(true)} title="Add Timetable Entry">
-            <MdInsertDriveFile size={32} />
-          </button>
+          
+          <MdInsertDriveFile size={32} />
         </div>
       </div>
         ): ( <p>Loading ...</p> )}
@@ -274,7 +273,8 @@ export default function Dashboard() {
                 <Link to="/timetable" className="text-blue-400 hover:underline">
                   View timetable
                 </Link>
-      <SideBar/>
+    <Navbar />
+
     
     </div>
 

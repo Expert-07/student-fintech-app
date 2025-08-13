@@ -51,6 +51,12 @@ app.use('/api/incomes', incomeRoutes);
 //Social routes
 const socialRoutes = require('./routes/socialRoutes');
 app.use('/api/social', socialRoutes);
+
+//readingplanner routes
+const readingPlannerRoutes = require('./routes/readingPlannerRoutes');
+app.use('/api/readingplanner', readingPlannerRoutes);
+const notificationRoutes = require('./routes/notificationRoutes');
+app.use('/api/notifications', notificationRoutes);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => 
     console.log(`Server running on port: ${PORT}`)

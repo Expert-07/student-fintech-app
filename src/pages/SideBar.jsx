@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { NavLink } from "react-router-dom";
 import "../css/Dashboard.css";
 
 export default function SideBar() {
@@ -13,58 +13,55 @@ export default function SideBar() {
         <nav className="dashboard-nav">
           <ul>
             <li>
-              <Link to="/dashboard" className="active">
+              <NavLink to="/dashboard" activeClassName="active">
                 <i className="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
-
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <Link to="/reading-planner">
+              <NavLink to="/reading-planner" activeClassName="active">
                 <i className="fas fa-book-open"></i>
                 <span>Reading Planner</span>
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <Link to="/finance">
+              <NavLink to="/finance" activeClassName="active">
                 <i className="fas fa-wallet"></i>
                 <span>Finance Tracker</span>
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <Link to="/campus-map">
+              <NavLink to="/campus-map" activeClassName="active">
                 <i className="fas fa-map-marker-alt"></i>
                 <span>Campus Map</span>
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <a href="#">
+              <NavLink to="#" activeClassName="active">
                 <i className="fas fa-chart-line"></i>
                 <span>Progress Reports</span>
-              </a>
+              </NavLink>
             </li>
             <li>
-              <Link to="/profile">
+              <NavLink to="/profile" activeClassName="active">
                 <i className="fas fa-user"></i>
                 <span>Profile</span>
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <Link to="/settings">
+              <NavLink to="/settings" activeClassName="active">
                 <i className="fas fa-cog"></i>
                 <span>Settings</span>
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <a href="/logout">
+              <NavLink to="/logout" activeClassName="active">
                 <i className="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
-              </a>
+              </NavLink>
             </li>
           </ul>
         </nav>
       </aside>
-
-    
     );
 }

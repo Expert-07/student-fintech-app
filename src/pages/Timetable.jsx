@@ -11,6 +11,7 @@ const Timetable = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [notification, setNotification] = useState("");
   const fileInputRef = useRef();
   // Handle PDF upload
   const handlePDFUpload = async (e) => {
@@ -35,7 +36,7 @@ const Timetable = () => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Upload failed");
-      alert("PDF uploaded successfully!");
+      setNotification("PDF uploaded successfully!");
       // Optionally, refresh timetable or show link
     } catch (err) {
       setUploadError(err.message);
@@ -130,6 +131,7 @@ const Timetable = () => {
         </div>
         {uploading && <span className="text-blue-500">Uploading...</span>}
         {uploadError && <span className="text-red-500">{uploadError}</span>}
+        {notification && <span className="text-green-500">{notification}</span>}
       </div>
       {loading ? (
         <p className="text-center">Loading timetable...</p>

@@ -8,6 +8,10 @@ import {jwtDecode} from "jwt-decode";
 import SideBar from "./SideBar";
 import useWeeklySummary from "./useWeeklySummary";
 import BudgetSuggestions from "./BudgetSuggestions";
+import { Pie } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const expenseCategories = [
   "Food",
@@ -34,6 +38,7 @@ export default function Finance() {
   const [monthlyIncome, setMonthlyIncome] = useState(null);
   const [monthlyIncomeLoading, setMonthlyIncomeLoading] = useState(true);
   const [monthlyIncomeError, setMonthlyIncomeError] = useState("");
+  const [notification, setNotification] = useState(""); // Notification state
 
   // Top-up handler (now adds to incomes table, not wallet)
   const handleTopup = async (e) => {
@@ -56,7 +61,7 @@ export default function Finance() {
       setTopupAmount("");
       // Refresh monthly income after adding new income
       fetchMonthlyIncome();
-      alert("Income added successfully!");
+      setNotification("Income added successfully!"); // Set success notification
     } catch (err) {
       setTopupError(err.message);
     } finally {
@@ -194,6 +199,22 @@ export default function Finance() {
     fetchMonthlyIncome();
   }, []);
 
+  const calculateChartData = () => {
+    const income = wallet?.totalIncome || 0;
+    const expenses = wallet?.totalExpenses || 0;
+
+    return {
+      labels: ['Income', 'Expenses'],
+      datasets: [
+        {
+          data: [income, expenses],
+          backgroundColor: ['#4caf50', '#f44336'],
+          hoverBackgroundColor: ['#66bb6a', '#e57373'],
+        },
+      ],
+    };
+  };
+
   return (
     <div className="dashboard-layout">
       {/* Sidebar Navigation */}
@@ -235,13 +256,22 @@ export default function Finance() {
               </div>
               <div className="stat-title">Total Balance</div>
               <div className="stat-value">
-                {wallet
-                  ? `₦${Number(wallet.balance).toLocaleString('en-NG', {
+                {wallet && typeof wallet.totalBalance === 'number'
+                  ? `₦${Number(wallet.totalBalance).toLocaleString('en-NG', {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}`
                   : "Loading..."}
               </div>
+            {/* Show total income and total expenses for clarity */}
+            <div className="stat-subtext" style={{marginTop: '0.5rem', fontSize: '0.95em'}}>
+              {wallet && (
+                <>
+                  <span style={{display:'block'}}>Total Income: ₦{Number(wallet.totalIncome).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span style={{display:'block'}}>Total Expenses: ₦{Number(wallet.totalExpenses).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </>
+              )}
+            </div>
               <div className="stat-subtext">
                 {loadingWeekly && "Loading weekly spend..."}
                 {!loadingWeekly && summary && summary.totalSpent !== undefined && (
@@ -423,7 +453,7 @@ export default function Finance() {
                     <option>All Time</option>
                   </select>
                 </div>
-                <canvas ref={incomeExpenseChartRef} id="incomeExpenseChart"></canvas>
+                <Pie data={calculateChartData()} />
               </div>
             </div>
           </div>

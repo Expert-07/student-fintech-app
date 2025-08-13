@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 export default function LoginTemplate() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [notification, setNotification] = useState(""); // For displaying notifications
 
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -32,7 +33,7 @@ export default function LoginTemplate() {
       const responseData = await res.json();
 
       if (!res.ok) {
-        alert(responseData.message || "Login failed");
+        setNotification(responseData.message || "Login failed");
       } else {
         console.log("Login successful. Token:", responseData.token);
         console.log("Saved token: ", localStorage.getItem("token"));
@@ -42,7 +43,7 @@ export default function LoginTemplate() {
       }
     } catch (err) {
       console.error("Login error:", err);
-      alert("Something went wrong.");
+      setNotification("Something went wrong.");
     }
 
     console.log("Logging in:", form);
@@ -138,6 +139,11 @@ export default function LoginTemplate() {
               Don't have an account? <Link to="/register">Sign up here</Link>
             </div>
           </form>
+          {notification && (
+            <div className="lt-notification">
+              {notification}
+            </div>
+          )}
         </div>
       </div>
     </div>
